@@ -1,0 +1,3512 @@
+# Dokumentasi Penjelasan Proyek UTS
+
+## Personal Homeschooling Learning System
+### Aplikasi Manajemen Pembelajaran Homeschooling Berbasis Java Swing
+
+**Mata kuliah:** Object-Oriented Programming (OOP)
+**Keperluan:** Persiapan Ujian Tengah Semester (UTS) dan bahan presentasi kepada dosen
+**Lokasi project:** `D:\my-projects\Homeschooling`
+**Bahasa pemrograman:** Java 21 | **Antarmuka:** Java Swing | **Build:** Maven | **Penyimpanan:** JSON lokal
+
+---
+
+## Kelompok Penyusun
+
+| No. | Nama | NIM | Pembagian Area Bahasan (disarankan saat presentasi) |
+|---|---|---|---|
+| 1 | Aldi Pratama | 250111002 | Arsitektur & lapisan OOP (Model–Service–Repository–UI), penerapan Abstraction, Encapsulation, dan Relations |
+| 2 | Anggara Prasetyo | 250111005 | Autentikasi, sesi, keamanan kata sandi, dan siklus koneksi pengajar–siswa (undangan, permintaan, persetujuan) |
+| 3 | Khadiq Zarkasy | 250111014 | Modul pembelajaran (mata pelajaran, jadwal, materi, tugas, evaluasi), laporan progres, dan pengujian |
+
+> Pembagian di atas adalah pembagian presentasi yang dapat dipakai saat/demo. Seluruh kode ditulis bersama dalam satu repository dan tidak dipisah per anggota.
+
+---
+
+## Daftar Isi
+
+| Bab | Judul | Isi Utama |
+|---|---|---|
+| 1 | Identitas dan Gambaran Umum Proyek | Nama, anggota, jenis aplikasi, ruang lingkup |
+| 2 | Latar Belakang dan Permasalahan | Masalah nyata yang ingin diselesaikan |
+| 3 | Tujuan Pengembangan | Tujuan umum dan tujuan khusus |
+| 4 | Target Pengguna dan Manfaat | Kebutuhan pengajar, kebutuhan siswa, manfaat |
+| 5 | Penjelasan Seluruh Fitur Aplikasi | Fitur A–N, kegunaan, cara kerja, status |
+| 6 | Alur Penggunaan Aplikasi | Alur end-to-end + diagram Mermaid |
+| 7 | Teknologi yang Digunakan | Java, Swing, Maven, Jackson, JDK Security |
+| 8 | Penerapan Object-Oriented Programming | Class, Object, Attribute, Method, Constructor, Encap., Inherit., Poly., Abstraction |
+| 9 | Data, Relasi, dan Penyimpanan | Jenis data, relasi, mekanisme JSON, persistensi |
+| 10 | Desain UI dan Pengalaman Pengguna | Layout, navigasi, tabel, formulir, gaya visual |
+| 11 | Status Prototype untuk UTS | Tabel status per fitur beserta bukti |
+| 12 | Panduan Demo UTS | Langkah demi langkah menjalankan di NetBeans |
+| 13 | Rencana Pengembangan UTS–UAS | 8 tahapan, tujuan dan kriteria selesai |
+| 14 | Target Hasil Akhir UAS | Gambaran aplikasi final |
+| 15 | Kelebihan, Keterbatasan, Lanjutan | Analisis jujur prototype |
+| 16 | Kesimpulan | Ringkasan seluruh pembahasan |
+| 17 | Pertanyaan yang Mungkin Diajukan Dosen | 18 pertanyaan + jawaban |
+
+---
+
+## Cara Membaca Dokumen Ini
+
+Dokumen ini disusun **langsung dari source code**, bukan dari rencana. Karena itu setiap klaim tentang "fitur sudah berjalan" disertai bukti berupa nama class, nama method, atau hasil pengujian otomatis.
+
+### Legenda Status Fitur
+
+| Status | Arti |
+|---|---|
+| **Sudah berfungsi** | Alur berjalan dan terverifikasi melalui kode dan/atau pengujian otomatis (JUnit 5) yang lulus. |
+| **Sebagian berfungsi** | Hanya sebagian alur yang berjalan; ada bagian yang belum terhubung atau belum terbukti. |
+| **Tampilan saja** | Antarmuka tersedia, tetapi fungsi di baliknya belum terhubung atau belum terbukti bekerja. |
+| **Direncanakan** | Belum diimplementasikan; hanya rancangan untuk tahap berikutnya. |
+
+### Ringkasan Hasil Verifikasi
+
+| Aspek | Hasil | Bukti |
+|---|---|---|
+| Build | **Berhasil** | `mvnw.cmd clean test` selesai tanpa error kompilasi (JDK 21.0.12.1 Temurin, Maven 3.9.16) |
+| Pengujian otomatis | **Berhasil** | 67 test pada 16 kelas test, 0 gagal, 0 error, 0 skipped |
+| Menjalankan aplikasi | **Berhasil** | `id.edu.homeschool.Main` dijalankan sungguhan; jendela Swing terbuka |
+| Penyimpanan data | **Berhasil** | Berkas JSON terbentuk di `~/.homeschooling-learning-system/data/` dan data tetap ada setelah aplikasi ditutup |
+
+> Catatan jujur: `README.md` masih menyebut **"63 test ... pada 16 kelas test"** dan **"21 PNG"**. Angka hasil verifikasi yang benar adalah **67 test pada 16 kelas test** dan **22 PNG**. (Pada versi README paling lama, angkanya bahkan lebih lama lagi: "51 test" dan "14 PNG".) Dokumentasi ini memakai angka hasil verifikasi terbaru; pembaruan `README.md` sendiri masih termasuk dalam rencana Tahap 8.
+
+---
+## BAB 1 — Identitas dan Gambaran Umum Proyek
+
+### 1.1 Nama dan Subjudul
+
+- **Nama proyek:** Personal Homeschooling Learning System
+- **Subjudul:** Aplikasi Manajemen Pembelajaran Homeschooling Berbasis Java Swing
+
+Subjudul ini menjelaskan dua hal sekaligus. Pertama, kata **"Personal"** menegaskan bahwa aplikasi ini dipakai untuk mengelola proses belajar sekelompok orang — yaitu keluarga yang belajar secara homeschooling, umumnya satu pengajar dan satu sampai beberapa anak. Kedua, kata **"Java Swing"** menegaskan teknologi antarmukanya, yang penting untuk Bab UTS karena fokus mata kuliah adalah pemrograman berorientasi objek, bukan pemrograman web.
+
+### 1.2 Identitas Anggota Kelompok
+
+| Nama | NIM | Peran dalam Dokumentasi |
+|---|---|---|
+| Aldi Pratama | 250111002 | Arsitektur lapisan dan penerapan konsep OOP |
+| Anggara Prasetyo | 250111005 | Autentikasi, sesi, dan alur koneksi pengajar–siswa |
+| Khadiq Zarkasy | 250111014 | Modul pembelajaran, laporan progres, dan pengujian |
+
+### 1.3 Gambaran Umum Aplikasi
+
+Personal Homeschooling Learning System adalah aplikasi **desktop** yang membantu orang tua dan pengajar homeschooling menjalankan kegiatan belajar secara lebih terstruktur. Dalam satu aplikasi, pengajar dapat:
+
+1. membuat akun dan masuk ke sistem;
+2. membuat **kode undangan** lalu menerimanya ke siswa;
+3. menyetujui permintaan koneksi siswa;
+4. mencatat mata pelajaran, materi, jadwal belajar, tugas, target belajar, dan evaluasi untuk siswa tersebut;
+5. melihat ringkasan progres belajar siswa dalam bentuk angka dan narasi.
+
+Sementara itu siswa dapat masuk dengan akunnya, melihat jadwal yang sudah ditetapkan, membuka isi materi, mengerjakan tugas, menandai tugas yang sudah selesai, dan melihat hasil evaluasi beserta umpan balik dari pengajar.
+
+Kunci desain dari aplikasi ini adalah **pemisahan data berdasarkan relasi**. Data milik seorang siswa tidak dapat dibaca oleh siswa lain, dan data milik seorang pengajar tidak dapat dibuka oleh pengajar lain. Aturan ini ditegakkan di lapisan service, bukan sekadar disembunyikan lewat menu.
+
+### 1.4 Jenis Aplikasi dan Teknologi Utama
+
+| Aspek | Keterangan |
+|---|---|
+| Jenis aplikasi | Aplikasi desktop satu jendela (*single-window desktop application*) |
+| Bahasa | Java 21 (level bytecode 65) |
+| Antarmuka | Java Swing (`javax.swing`) — seluruh komponen digambar sendiri, tanpa library UI pihak ketiga |
+| Build | Maven, memakai Maven Wrapper (`mvnw.cmd`) sehingga tidak perlu memasang Maven secara terpisah |
+| Penyimpanan | Berkas JSON lokal per jenis data, ditulis secara atomik |
+| Pengujian | JUnit Jupiter 5 (67 test, 16 kelas test) |
+
+### 1.5 Ruang Lingkup Pengembangan
+
+**Yang termasuk ruang lingkup (dan sudah ada di dalam prototype):**
+
+- autentikasi lokal dengan dua peran: pengajar dan siswa;
+- siklus undangan → permintaan → persetujuan koneksi;
+- pengelolaan (CRUD) enam jenis data belajar: mata pelajaran, materi, jadwal belajar, tugas, target belajar, dan evaluasi;
+- dashboard ringkasan dan laporan progres yang dihitung dari data tersimpan;
+- direktori orang yang terhubung dan halaman profil;
+- penyimpanan JSON yang bertahan setelah aplikasi ditutup.
+
+**Yang di luar ruang lingkup prototype (direncanakan untuk tahap berikutnya):**
+
+- basis data SQL terpusat dan penggunaan bersama antar-perangkat;
+- verifikasi identitas pengajar oleh administrator;
+- pemulihan kata sandi (lupa kata sandi) dan pembatasan percobaan login;
+- ekspor laporan ke PDF/Excel, pencetakan, dan lampiran berkas pada materi;
+- pengingat/notifikasi tenggat tugas dan jadwal;
+- sinkronisasi antar-perangkat dan mode luring.
+
+Ruang lingkup ini penting disebut di depan agar batas antara "prototype UTS" dan "aplikasi final UAS" tidak kabur. Bab 11 dan Bab 13 menguraikannya secara rinci.
+
+### 1.6 Peta Struktur Project
+
+```text
+D:\my-projects\Homeschooling
+├── pom.xml                  Konfigurasi Maven: Java 21, Jackson, JUnit 5
+├── mvnw / mvnw.cmd          Maven Wrapper (Maven 3.9.16)
+├── README.md                Ringkasan teknis project
+├── UTS-CLASS-GUIDE.md       Panduan presentasi class project
+├── DOKUMENTASI_PENJELASAN_PROYEK_UTS.md   Dokumen ini
+├── src/main/java/id/edu/homeschool/
+│   ├── Main.java                      Entry point, composition root
+│   ├── model/         (22 file)       Entitas domain & enum status
+│   ├── repository/    (4 file)        Abstraksi & implementasi JSON
+│   ├── service/       (18 file)       Aturan bisnis, sesi, keamanan
+│   ├── ui/            (18 file)       Jendela, shell, dan halaman
+│   └── ui/design/     (17 file)       Token visual & komponen reusable
+├── src/test/java/id/edu/homeschool/
+│   ├── model/ repository/ service/ ui/ support/
+└── tools/                           Harness manual untuk tangkapan layar
+```
+
+Total class sumber produksi: **80 class** (22 model + 4 repository + 18 service + 18 ui + 18 ui.design).
+
+---
+## BAB 2 — Latar Belakang dan Permasalahan
+
+### 2.1 Gambaran Latar Belakang
+
+Homeschooling adalah cara belajar yang berlangsung di rumah dengan pendampingan orang tua atau pengajar keluarga. Berbeda dengan sekolah formal, tidak ada buku catatan resmi, jadwal dinding, dan rapor yang dikelola seragam. Semua catatan pembelajaran umumnya tersimpan di buku tulis, pesan instan, atau berkas yang tersebar di beberapa tempat.
+
+Kondisi ini menjadi masalah nyata ketika:
+- ada lebih dari satu anak yang belajar;
+- ada beberapa mata pelajaran yang harus diselesaikan;
+- kegiatan belajar berlangsung berbulan-bulan, bukan satu semester terstruktur;
+- orang tua bekerja sehingga waktu untuk memandu tidak selalu tersedia;
+- lebih dari satu pengajar membantu, misalnya tutor untuk mata pelajaran tertentu.
+
+### 2.2 Permasalahan yang Ingin Diselesaikan
+
+| No. | Permasalahan | Akibat yang Dirasakan |
+|---|---|---|
+| P1 | **Jadwal belajar tersebar dan sulit dipantau** | Jadwal tertulis di kertas atau chat terpisah; tidak ada satu tampilan yang menunjukkan hari ini siswa belajar apa dan berapa lama. |
+| P2 | **Materi pembelajaran tidak terorganisasi** | Materi berupa berkas dan tautan yang bertebaran; siswa harus mencari sendiri dan sering membuka materi yang salah. |
+| P3 | **Tugas dan tenggat waktu sulit dikelola** | Tidak ada daftar tugas yang jelas, sehingga siswa tidak tahu apa yang harus dikerjakan dan pengajar tidak tahu tugas mana yang belum dikerjakan. |
+| P4 | **Evaluasi dan nilai tidak terdokumentasi secara terpusat** | Nilai tersebar di kertas-kertas; sulit ditelusuri kembali, dan tidak ada umpan balik tertulis yang bisa dibaca siswa. |
+| P5 | **Progres siswa sulit dirangkum** | Mustahil menjawab pertanyaan seperti "berapa persen tugas yang sudah selesai?" atau "rata-rata nilai semester ini berapa?" tanpa menghitung manual. |
+| P6 | **Pengajar membutuhkan cara terstruktur mengelola beberapa siswa** | Setiap siswa punya kondisi berbeda; tanpa pemisahan data, materi satu siswa bisa salah dibuka oleh siswa lain. |
+
+### 2.3 Mengapa Sistem Terintegrasi Berpotensi Membantu
+
+Enam masalah di atas memiliki akar yang sama: **data pembelajaran tidak pernah berada di satu tempat yang bisa dibaca program**. Karena itu, pendekatan yang diambil proyek ini adalah menyediakan satu tempat penyimpanan data yang terstruktur, dengan aturan akses yang jelas.
+
+Sistem terintegrasi membantu dengan cara:
+
+1. **Satu sumber data.** Jadwal, materi, tugas, dan evaluasi disimpan sebagai record terpisah yang saling terhubung lewat ID. Ketika semua record berada di satu direktori data, ringkasan progres dapat dihitung otomatis.
+2. **Aturan akses ditegakkan oleh program.** Setiap record belajar memiliki *ownership grant* yang mencatat siapa pengajar pembuatnya dan siswa pemilik sah. Aturan ini diperiksa setiap kali data dibaca atau ditulis, sehingga data antar-siswa tidak saling tumpah.
+3. **Hubungan pengajar–siswa dibuat eksplisit.** Kode undangan dan persetujuan membuat relasi menjadi data, bukan asumsi. Pengajar baru dapat menulis data untuk siswa yang benar-benar terhubung dengannya.
+4. **Riwayat aktivitas tersimpan otomatis.** Setiap jadwal, tugas, evaluasi, dan target tercatat dengan waktunya, sehingga halaman "aktivitas terbaru" dan laporan progres selalu cocok dengan isi penyimpanan.
+
+### 2.4 Batasan Klaim
+
+Permasalahan pada bagian ini berasal dari **pengamatan terhadap proses belajar homeschooling sehari-hari dan dari cacat yang teridentifikasi saat merancang sistem**, **bukan** dari hasil survei atau penelitian empiris. Tidak ada instrumen riset yang disebarkan pada prototype ini, sehingga tidak ada angka persentase, jumlah responden, atau temuan lapangan yang dapat diklaim. Dokumentasi ini sengaja tidak mencantumkan angka-angka seperti itu.
+
+---
+## BAB 3 — Tujuan Pengembangan
+
+### 3.1 Tujuan Umum
+
+> **Mengembangkan aplikasi manajemen pembelajaran homeschooling berbasis Java Swing yang dapat dijalankan sebagai prototype desktop, memisahkan data pengajar dan data siswa secara aman, dan menerapkan konsep pemrograman berorientasi objek secara nyata dalam struktur kodenya.**
+
+### 3.2 Tujuan Khusus
+
+Setiap tujuan khusus di bawah ini punya padanan konkret di dalam kode. Kolom "Bukti" menunjukkan ke mana tujuan itu direalisasikan, sehingga saat demo setiap tujuan dapat ditunjuk dengan cepat.
+
+| No. | Tujuan Khusus | Bukti dalam Kode | Status |
+|---|---|---|---|
+| T1 | Mengelola informasi akun siswa dan pengajar | `model/UserAccount.java`, `model/AccountRole.java`, `service/AuthService.java` | Tercapai |
+| T2 | Mengatur mata pelajaran dan jadwal belajar | `model/Subject.java`, `model/StudySession.java`, `ui/SubjectPage.java`, `ui/SchedulePage.java` | Tercapai |
+| T3 | Menyediakan materi pembelajaran yang terorganisasi | `model/LearningMaterial.java`, `ui/MaterialPage.java`, `ui/design/DetailDialog.java` | Tercapai |
+| T4 | Mengelola tugas beserta status pengerjaan | `model/LearningTask.java`, `ui/TaskPage.java`, `LearningWorkspaceService.setTaskCompleted()` | Tercapai |
+| T5 | Mencatat hasil evaluasi beserta umpan balik | `model/Evaluation.java`, `ui/EvaluationPage.java`, `LearningWorkspaceService.saveEvaluation()` | Tercapai |
+| T6 | Menyediakan ringkasan dan laporan progres belajar | `service/ProgressReport.java`, `ui/ProgressPage.java`, `ui/DashboardPage.java` | Tercapai |
+| T7 | Mengatur target belajar yang terukur | `model/LearningGoal.java`, `ui/GoalPage.java`, `LearningWorkspaceService.setGoalAchieved()` | Tercapai |
+| T8 | Menghubungkan pengajar dan siswa melalui kode undangan | `service/ConnectionService.java`, `ui/InvitationsPage.java`, `ui/StudentConnectionsPage.java`, `ui/TeacherRequestsPage.java` | Tercapai |
+| T9 | Menerapkan konsep OOP secara nyata | `model/Pengguna.java` (abstract), `model/LearningItem.java` (abstract), `repository/Repository.java` (interface), `ui/AppShell.Refreshable` (interface) | Tercapai |
+| T10 | Menyediakan prototype yang dapat dijalankan melalui Apache NetBeans | `pom.xml`, `Main.java`, `mvnw.cmd`, `README.md` bagian "Membuka di NetBeans" | Tercapai |
+| T11 | Melakukan pengujian otomatis atas logika inti | 67 test JUnit 5 pada 16 kelas test di `src/test/java` | Tercapai |
+| T12 | Menyediakan data contoh agar tampilan tidak pernah kosong | `service/DemoDataService.java`, berkas penanda `demo-data.json` | Tercapai |
+| T13 | Mengganti penyimpanan JSON dengan basis data SQL terpusat | Tidak ada kelas JDBC/DB di project | **Belum** (rencana UAS) |
+| T14 | Menyediakan administrator yang menyetujui pendaftaran pengajar | Tidak ada peran `ADMIN` pada `AccountRole` | **Belum** (rencana UAS) |
+
+### 3.3 Keterkaitan Tujuan dengan Ruang Lingkup
+
+Tujuan T1 sampai T12 saling membangun: tanpa T1 dan T8 tidak ada data yang bisa dicatat (T2 sampai T7); tanpa T2 sampai T7 tidak ada yang bisa dirangkum (T6); tanpa T9 dan T11 kualitas kode dan keyakinannya tidak terbukti; tanpa T12 demo terasa kosong dan sulit dinilai.
+
+T13 dan T14 sengaja tidak dipaksakan diselesaikan pada tahap UTS karena keduanya menuntut perubahan arsitektural besar (mengganti lapisan repository dengan JDBC, dan menambah peran serta alur persetujuan) yang lebih masuk akal dikerjakan setelah prototipe terbukti secara fungsional.
+
+---
+## BAB 4 — Target Pengguna dan Manfaat
+
+Aplikasi ini memiliki **dua kelompok pengguna** yang dibedakan secara tegas oleh peran akun (`AccountRole`). Setiap kelompok memperoleh tampilan, menu, dan hak akses yang berbeda.
+
+### 4.1 Kelompok Pengguna A: Pengajar
+
+**Siapa?** Orang tua yang menjadi pembimbing utama, atau tutor yang mengerjakan sebagian mata pelajaran untuk keluarga homeschooling.
+
+**Kebutuhan yang harus dipenuhi:**
+
+1. **Mengelola data siswa yang terhubung.** Pengajar perlu tahu siapa saja siswa yang ia bimbing, dan tanpa harus mengelola data pribadi yang tidak diperlukan.
+2. **Menyusun mata pelajaran.** Menyusun kurikulum yang dipakai bersama dengan materi, jadwal, tugas, dan evaluasi. Mata pelajaran perlu menjadi "induk" agar data lain tidak bertebaran bebas.
+3. **Menyusun jadwal belajar.** Tanggal, jam mulai, durasi, dan catatan sesi perlu tercatat agar agenda terlihat jelas.
+4. **Menyiapkan materi.** Materi sebaiknya membawa tujuan pembelajaran, penjelasan, contoh, dan latihan agar siswa bisa belajar sendiri.
+5. **Memberikan tugas.** Tugas perlu punya judul, instruksi yang jelas, mata pelajaran, dan tenggat.
+6. **Menilai dan memberi umpan balik.** Nilai harus disertai catatan agar siswa memahami apa yang perlu diperbaiki.
+7. **Melihat progres.** Pengajar perlu ringkasan: berapa tugas yang selesai, berapa yang terlambat, dan rata-rata nilainya.
+8. **Mengontrol akses.** Pengajar harus bisa memutuskan siapa yang boleh melihat data siswanya, dan harus bisa mencabut akses tersebut.
+
+**Kebutuhan tersebut sudah dijawab oleh aplikasi ini sebagai berikut:**
+
+| Kebutuhan | Dijawab oleh | Status |
+|---|---|---|
+| Mengelola data siswa terhubung | `LearningWorkspaceService.connectedStudents()` + halaman "Data siswa" | Sudah berfungsi |
+| Menyusun mata pelajaran | `SubjectPage` | Sudah berfungsi |
+| Menyusun jadwal | `SchedulePage` | Sudah berfungsi |
+| Menyiapkan materi | `MaterialPage` + `DetailDialog` | Sudah berfungsi |
+| Memberikan tugas | `TaskPage` | Sudah berfungsi |
+| Menilai | `EvaluationPage` | Sudah berfungsi |
+| Melihat progres | `DashboardPage`, `ProgressPage` | Sudah berfungsi |
+| Mengontrol akses | `InvitationsPage`, `TeacherRequestsPage`, "Akhiri koneksi" | Sudah berfungsi |
+
+**Batasan akses pengajar yang ditegakkan program:**
+
+- Pengajar hanya dapat menulis data untuk siswa yang memiliki relasi `ACTIVE` dengannya (`LearningWorkspaceService.requireTeacherForStudent()`).
+- Pengajar tidak dapat memproses permintaan koneksi milik pengajar lain (`ConnectionService.requireOwnedRequest()` melempar `SecurityException`).
+- Pengajar tidak dapat mengubah relasi milik orang lain; pencabutan hanya bisa dilakukan untuk relasi miliknya sendiri.
+- Pengajar tidak dapat melihat catatan belajar siswa yang tidak terhubung dengannya, meskipun keduanya memakai aplikasi yang sama.
+
+### 4.2 Kelompok Pengguna B: Siswa
+
+**Siapa?** Anak atau remaja yang belajar di rumah dengan pendampingan pengajar.
+
+**Kebutuhan yang harus dipenuhi:**
+
+1. **Melihat jadwal belajar.** "Hari ini saya belajar apa, jam berapa, berapa lama?"
+2. **Membaca materi.** Materi harus dapat dibuka dan dibaca di dalam aplikasi, lengkap dengan tujuan pembelajaran dan latihan.
+3. **Mengetahui tugas.** Daftar tugas beserta tenggat dan instruksinya.
+4. **Menandai tugas yang sudah dikerjakan.** Siswa perlu memberi tahu status pengerjaan, tanpa boleh mengubah isi tugas.
+5. **Memeriksa nilai dan umpan balik.** Termasuk catatan pengajar atas hasil belajarnya.
+6. **Memantau progres sendiri.** Berapa persen tugas yang selesai, berapa target yang tercapai.
+7. **Melihat daftar pengajar yang terhubung**, agar tahu siapa yang menjadi rujukan.
+
+**Kebutuhan tersebut sudah dijawab oleh aplikasi ini sebagai berikut:**
+
+| Kebutuhan | Dijawab oleh | Status |
+|---|---|---|
+| Melihat jadwal | `SchedulePage` (mode baca) + kartu "Jadwal terdekat" di dashboard | Sudah berfungsi |
+| Membaca materi | `MaterialPage` + tombol "Lihat materi" | Sudah berfungsi |
+| Mengetahui tugas | `TaskPage` (mode baca) + kartu "Tugas terdekat" | Sudah berfungsi |
+| Menandai tugas selesai | `TaskPage` + tombol "Tandai selesai" | Sudah berfungsi |
+| Memeriksa nilai | `EvaluationPage` + tombol "Lihat nilai" | Sudah berfungsi |
+| Memantau progres | `DashboardPage`, `ProgressPage` | Sudah berfungsi |
+| Melihat pengajar terhubung | `DirectoryPage` mode "Data pengajar" | Sudah berfungsi |
+| Mengajukan koneksi ke pengajar | `StudentConnectionsPage` | Sudah berfungsi |
+
+**Batasan akses siswa yang ditegakkan program:**
+
+- Siswa hanya dapat membaca record yang memiliki grant dengan `studentAccountId` miliknya sendiri.
+- Siswa **tidak dapat** membuat, mengubah, atau menghapus record belajar apa pun; satu-satunya perubahan yang boleh ia lakukan adalah menandai flag `completed` pada tugas miliknya sendiri.
+- Siswa **tidak dapat** menandai target belajar sebagai tercapai; hanya pengajar yang boleh melakukannya (`setGoalAchieved()` hanya menerima peran pengajar).
+- Siswa **tidak dapat** membaca data siswa lain; `LearningWorkspaceFlowTest.studentCannotReadAnotherStudentAndCannotWriteAnything()` menguji hal ini secara eksplisit.
+
+### 4.3 Manfaat yang Diharapkan
+
+**Manfaat bagi pengajar:**
+
+| Manfaat | Dampak praktis |
+|---|---|
+| Data yang terpusat | Tidak lagi mencari berkas di beberapa folder atau aplikasi pesan. |
+| Batas akses yang jelas | Tidak ada kekhawatiran salah membuka data siswa lain. |
+| Rekap progres otomatis | Pertanyaan "berapa yang belum dikerjakan?" dijawab dalam hitungan detik. |
+| Materi yang dapat dipakai ulang | Materi yang sudah disusun lengkap dengan tujuan, contoh, dan latihan dapat dipakai ulang. |
+
+**Manfaat bagi siswa:**
+
+| Manfaat | Dampak praktis |
+|---|---|
+| Satu tempat untuk semua informasi belajar | Tidak perlu menebak di mana instruksi tugas berada. |
+| Tenggat yang terlihat jelas | Tugas terlambat langsung terlihat pada kolom status ("Terlambat"). |
+| Umpan balik tertulis | Catatan pengajar tersimpan bersama nilai. |
+| Rasa kemajuan | Persentase penyelesaian tugas dan capaian target menampilkan kemajuan secara konkret. |
+
+### 4.4 Membedakan Manfaat yang Direncanakan dan yang Sudah Terbukti
+
+| Klaim manfaat | Status | Bukti / Alasan |
+|---|---|---|
+| Data tidak lagi tersebar | **Terbukti** | Semua record berada di satu direktori data dengan format JSON per jenis data. |
+| Siswa A tidak dapat membaca data siswa B | **Terbukti** | Diuji pada `LearningWorkspaceFlowTest` dan `LearningActivityTest`. |
+| Rekap progres dihitung otomatis dari data | **Terbukti** | `LearningWorkspaceService.progress()`; diuji pada `LearningWorkspaceFlowTest.progressReportReflectsRepositoryData()`. |
+| Data tetap ada setelah aplikasi ditutup | **Terbukti** | Diuji pada `LearningWorkspaceFlowTest.recordsSurviveApplicationRestart()` dan `AuthFlowTest.registerLoginLogoutWorksAndAccountSurvivesRestart()`. |
+| Pengajar lebih hemat waktu dalam penilaian | **Perkiraan** | Belum ada pengukuran waktu sebelum dan sesudah memakai aplikasi. |
+| Meningkatkan motivasi siswa | **Perkiraan** | Belum ada pengukuran terhadap siswa. |
+| Mengurangi keterlambatan pengerjaan tugas | **Perkiraan** | Fitur status "Terlambat" sudah ada, namun belum ada data usage nyata untuk mengukur dampaknya. |
+| Cocok untuk sekolah dengan banyak siswa | **Perkiraan** | Model data mendukung banyak siswa, tetapi belum ada pengujian beban. |
+
+> Prinsip yang dipakai dalam dokumen ini: sebuah manfaat disebut **terbukti** hanya bila ada test otomatis atau bukti eksekusi yang mendukung; selain itu disebut **perkiraan**.
+
+---
+## BAB 5 — Penjelasan Seluruh Fitur Aplikasi
+
+Bab ini menjelaskan setiap fitur yang ada di dalam source code. Untuk setiap fitur, format yang dipakai konsisten: **Pengertian → Masalah yang dibantu → Pengguna → Informasi → Cara Pakai → Hubungan dengan Fitur Lain → Status → Pengembangan lanjutan**.
+
+Ringkasan status semua fitur dapat dilihat pada tabel di awal Bab 5.1.
+
+### 5.1 Ringkasan Status Fitur
+
+| Kode | Fitur | Pengajar | Siswa | Status |
+|---|---|---|---|---|
+| A | Login, registrasi, logout | Ya | Ya | Sudah berfungsi |
+| B | Dashboard | Ya | Ya | Sudah berfungsi |
+| C | Pengelolaan data pengajar | Ya | Lihat | Sudah berfungsi |
+| D | Pengelolaan data siswa | Lihat | Ya | Sudah berfungsi |
+| E | Permintaan koneksi pengajar–siswa | Ya | Ya | Sudah berfungsi |
+| F | Mata pelajaran | CRUD | Baca | Sudah berfungsi |
+| G | Jadwal belajar | CRUD | Baca | Sudah berfungsi |
+| H | Materi pembelajaran | CRUD | Baca | Sudah berfungsi |
+| I | Tugas | CRUD | Baca + tandai selesai | Sudah berfungsi |
+| J | Evaluasi dan nilai | CRUD | Baca | Sudah berfungsi |
+| K | Laporan progres | Ya | Ya | Sudah berfungsi |
+| L | Profil dan pengaturan akun | Ya | Ya | Sudah berfungsi (sebagian: ubah profil & kata sandi) |
+| M | Target belajar | CRUD | Baca | Sudah berfungsi |
+| N | Data contoh (demo) | Ya | Ya | Sudah berfungsi |
+| O | Pencarian dan filter kolom | Ya | Ya | Sudah berfungsi |
+| P | Arsip data pra-akun | Baca | Baca | Sudah berfungsi (hanya baca) |
+| Q | Ekspor laporan / cetak | — | — | **Direncanakan** |
+| R | Pengingat tenggat tugas | — | — | **Direncanakan** |
+| S | Lampiran berkas pada materi | — | — | **Direncanakan** |
+| T | Verifikasi pendaftaran pengajar oleh admin | — | — | **Direncanakan** |
+
+---
+
+### 5.2 A. Login, Registrasi, dan Logout
+
+**Pengertian dan kegunaan.**
+Modul autentikasi adalah pintu masuk aplikasi. Tanpa ini, seluruh data belajar tidak memiliki pemilik yang jelas dan aturan hak akses tidak dapat ditegakkan. Modul ini menyediakan dua hal: **masuk** dengan akun yang sudah ada, dan **membuat akun baru**. Modul ini juga menyediakan **keluar** (logout) untuk mengakhiri sesi.
+
+**Masalah yang dibantu.**
+- Menghindarkan data belajar yang tidak memiliki pemilik.
+- Memastikan pengajar dan siswa hanya melihat miliknya masing-masing.
+- Menyediakan jejak siapa yang sedang bekerja di aplikasi.
+
+**Pengguna.** Semua pengguna: pengajar dan siswa.
+
+**Informasi yang dikelola.**
+`UserAccount` menyimpan: `id` (UUID), `name`, `email` (dinormalisasi huruf kecil), `passwordHash`, `role` (`PENGAJAR`/`SISWA`), `status` (`ACTIVE`/`DISABLED`), dan `educationLevel`.
+
+Format hash kata sandi yang disimpan:
+
+```text
+pbkdf2-sha256$210000$<base64url salt 22 karakter>$<base64url kunci 43 karakter>
+```
+
+**Cara penggunaan langkah demi langkah.**
+
+*Masuk:*
+1. Buka aplikasi. Jendela `AuthScreen` tampil dengan kartu "Selamat datang kembali".
+2. Isi field **Email** dan **Kata sandi**.
+3. Tekan tombol **Masuk**.
+4. Bila berhasil, `AuthService.login()` mengembalikan `UserSession` dan `MainFrame.showApplication()` menampilkan `AppShell`.
+5. Bila gagal, pesan galat tampil di bawah kartu, misalnya "Email atau kata sandi tidak valid, atau akun tidak aktif."
+
+*Registrasi:*
+1. Pada layar masuk, tekan tautan **"Belum punya akun? Daftar"**.
+2. Isi nama lengkap, email, pilih peran akun (Siswa/Pengajar).
+3. Bila peran **Siswa**, field **Jenjang pendidikan** muncul dan wajib diisi (contoh: SD, SMP, SMA).
+4. Isi kata sandi dan ulangi kata sandi.
+5. Tekan **Daftar**. Bila berhasil, aplikasi kembali ke layar masuk dengan pesan "Akun berhasil dibuat."
+6. **Kaidah kata sandi:** minimal 12 karakter, maksimal 128 karakter, harus memuat huruf dan angka.
+
+*Keluar:*
+1. Tekan tombol **Keluar** pada bar atas.
+2. `MainFrame.signOut()` memanggil `AuthService.logout(token)` yang menghapus token dari `SessionRegistry`, lalu menampilkan kembali `AuthScreen`.
+
+**Hubungan dengan fitur lain.**
+Modul ini menyediakan `token` yang dipakai seluruh service lain untuk memastikan identitas dan peran. Setiap service mengambil akun aktif melalui `SessionRegistry.requireAccount(token)`. Karena itu, logout benar-benar memutus akses: setelahnya token lama tidak lagi dikenali.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `AuthFlowTest` (6 test: registrasi, login, logout, akun bertahan setelah restart, email ganda, kata sandi lemah, akun nonaktif), `AuthServiceTest` (3 test), `AuthScreenTest` (1 test yang benar-benar menekan tombol "Masuk" pada formulir Swing dan memastikan sesi terbentuk).
+
+Catatan penting: kata sandi **tidak pernah** disimpan dalam bentuk polos. `UserAccount` tidak memiliki field maupun getter untuk kata sandi polos, dan `PasswordHasher` menggunakan PBKDF2-HMAC-SHA256 dengan 210.000 iterasi serta salt acak 16 byte per kata sandi.
+
+**Pengembangan yang masih diperlukan.**
+- Pemulihan kata sandi (lupa kata sandi) — belum ada.
+- Pembatasan percobaan login (rate limiting / lockout sementara) — belum ada.
+- Verifikasi identitas pengajar oleh administrator — belum ada; kebijakan prototype mengizinkan pendaftaran mandiri pengajar (lihat `AuthService.registerTeacher()`).
+- Sesi tidak bertahan setelah aplikasi ditutup; token hanya hidup di memori proses.
+
+---
+
+### 5.3 B. Dashboard
+
+**Pengertian dan kegunaan.**
+Dashboard adalah halaman pertama yang dilihat setelah masuk. Fungsinya memberikan gambaran singkat: "kondisi sekarang seperti apa?" Halaman ini bukan daftar hard-coded, melainkan dihitung ulang dari data tersimpan setiap kali halaman dibuka atau cakupan siswa berubah.
+
+**Masalah yang dibantu.**
+- Pengajar tidak perlu membuka enam halaman berbeda untuk tahu kondisi siswa.
+- Siswa dapat langsung melihat tugas terdekat dan jadwal mendatang.
+
+**Pengguna.** Pengajar dan siswa.
+
+**Informasi yang ditampilkan.**
+Lima kartu statistik:
+
+| Kartu | Nilai | Hint |
+|---|---|---|
+| Mata pelajaran | jumlah mata pelajaran | jumlah materi |
+| Jadwal belajar | jumlah sesi tercatat | total sesi |
+| Tugas tertunda | tugas total dikurangi yang selesai | jumlah yang terlambat |
+| Target tercapai | tercapai / total target | persentase capaian |
+| Rata-rata nilai | rata-rata persentase nilai | jumlah evaluasi |
+
+ Tiga daftar di bawahnya:
+- **Jadwal terdekat** — 6 sesi mendatang, diurutkan berdasarkan tanggal lalu waktu mulai, kolom: Tanggal, Waktu, Mata pelajaran.
+- **Tugas terdekat** — 6 tugas yang belum selesai, diurutkan berdasarkan tenggat, kolom: Tugas, Tenggat, Status.
+- **Aktivitas terbaru** — 6 entri gabungan dari jadwal, tugas, evaluasi, dan target, diurutkan menurun berdasarkan waktu.
+
+**Cara penggunaan langkah demi langkah.**
+1. Masuk ke aplikasi; dashboard otomatis terbuka.
+2. Bagi pengajar: pilih siswa pada pemilih di bar atas. Seluruh angka dan daftar berubah mengikuti siswa tersebut.
+3. Bila belum ada siswa terpilih, tampil empty state "Belum ada siswa terpilih".
+4. Klik salah satu kartu untuk memahami maknanya, atau gunakan sidebar untuk membuka halaman detail.
+
+**Hubungan dengan fitur lain.**
+Dashboard adalah **tampilan ringkasan** dari data yang sama dengan halaman-halaman lain. Sumber datanya:
+- angka-angka berasal dari `LearningWorkspaceService.progress()`;
+- jadwal dan tugas terdekat dari `LearningWorkspaceService.sessions()` dan `.tasks()`;
+- aktivitas terbaru dari `LearningWorkspaceService.recentActivity()`.
+
+Jadi Dashboard tidak memiliki salinan data sendiri — ia selalu konsisten dengan halaman lain.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `AppShellSmokeTest.dashboardAndProgressUseTheRepositoryData()`, `LearningActivityTest.activityFeedIsBuiltFromTheStoredRecords()`, dan `LearningActivityTest.activityFeedIsEmptyForAStudentWithoutRecords()`.
+
+**Pengembangan yang masih diperlukan.**
+- Grafik tren (misalnya nilai per bulan) — belum ada; saat ini baru angka ringkas.
+- Filter periode (mingguan/bulanan) — belum ada.
+- Ringkasan lintas siswa untuk pengajar yang punya banyak siswa — belum ada; dashboard selalu terikat pada satu siswa terpilih.
+
+---
+
+### 5.4 C. Pengelolaan Data Pengajar
+
+**Pengertian dan kegunaan.**
+Halaman "Data pengajar" menampilkan daftar orang yang terhubung dengan akun yang sedang masuk, beserta ringkasan pembelajaran mereka. Untuk peran siswa, halaman ini menampilkan daftar pengajar yang terhubung dengannya. Untuk peran pengajar, halaman ini menampilkan akun dirinya sendiri.
+
+**Masalah yang dibantu.**
+- Siswa perlu tahu siapa pengajar yang menjadi rujukan belajarnya.
+- Pengajar perlu melihat ringkasan angka yang relevan tentang jaringan belajarnya.
+
+**Pengguna.** terutama Siswa (meminta daftar pengajar) dan Pengajar (ringkasan jaringan).
+
+**Informasi yang ditampilkan.**
+Kolom tabel mode "Data pengajar": Nama, Email, Materi dibagi, Nilai rata-rata.
+Kolom tabel mode "Data siswa": Nama, Email, Jenjang, Materi, Tugas selesai, Nilai rata-rata.
+Tombol tambahan: **Lihat detail** (dialog berisi peran, jenjang, jumlah mata pelajaran, materi, tugas selesai, evaluasi, rata-rata nilai) dan, bagi pengajar, **Akhiri koneksi**.
+
+**Cara penggunaan langkah demi langkah.**
+1. Buka sidebar **Akun → Data pengajar**.
+2. Tabel dimuat ulang setiap kali halaman dibuka (`DirectoryPage.refresh()`), sehingga pengajar yang baru disetujui langsung muncul.
+3. Pilih satu baris, tekan **Lihat detail** untuk melihat rinciannya.
+4. Bagi pengajar: pilih baris siswa pada halaman "Data siswa", tekan **Akhiri koneksi**, lalu konfirmasi. Relasi berubah menjadi `ENDED` dan siswa langsung kehilangan akses, tetapi seluruh record belajar tetap tersimpan sehingga koneksi dapat dipulihkan nanti.
+
+**Hubungan dengan fitur lain.**
+Data di sini berasal dari `LearningWorkspaceService.teacherSummaries()` dan `.studentSummaries()`, yang keduanya membaca `TeacherStudentConnection` berstatus `ACTIVE` lalu menghitung progres lewat `.progress()`. Tombol "Akhiri koneksi" memanggil `ConnectionService.removeConnection()`.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `AppShellSmokeTest.directoryPagesListTheConnectedPeople()`, `LearningActivityTest.directorySummariesFollowTheConnectedPeople()`, `ConnectionFlowTest.teacherCanEndAnActiveConnection()`.
+
+**Pengembangan yang masih diperlukan.**
+- CRUD profil pengajar yang lengkap (misalnya bidang keahlian dan kualifikasi) — belum ada pada model akun. Field `Pengajar.expertise` dan `Pengajar.qualifications` ada di model lama, tetapi data akun modern (`UserAccount`) tidak memuat keduanya, sehingga belum bisa diedit lewat UI.
+- Daftar siswa per kelas/kelompok — belum ada; relasi bersifat satu pengajar–satu siswa.
+
+---
+
+### 5.5 D. Pengelolaan Data Siswa
+
+**Pengertian dan kegunaan.**
+Halaman "Data siswa" adalah cermin dari halaman "Data pengajar", dengan orientasi menampilkan anak-anak yang dibimbing pengajar beserta progres masing-masing.
+
+**Masalah yang dibantu.**
+- Pengajar harus bisa memantau banyak siswa sekaligus.
+- Angka pada halaman ini memungkinkan pengajar memutuskan siswa mana yang perlu perhatian khusus.
+
+**Pengguna.** Pengajar (utama) dan Siswa (melihat dirinya sendiri).
+
+**Informasi yang ditampilkan.**
+Sama seperti tabel pada 5.4: Nama, Email, Jenjang, Materi, Tugas selesai, Nilai rata-rata.
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Akun → Data siswa**.
+2. Tabel menampilkan siswa yang terhubung dengan akun pengajar yang sedang masuk.
+3. Gunakan kolom pencarian untuk menyaring nama.
+4. Gunakan filter **Jenjang** untuk menampilkan siswa berdasarkan jenjang pendidikan.
+5. Pilih baris → **Lihat detail** untuk rincian, atau **Akhiri koneksi** untuk memutus akses.
+
+**Hubungan dengan fitur lain.**
+Menjadi pintu masuk untuk memahami angka-angka yang dipakai pada Dashboard dan Laporan progres. Data ini juga dipakai untuk mengisi pemilih siswa di bar atas.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `AppShellSmokeTest.directoryPagesListTheConnectedPeople()`, `AppShellSmokeTest.switchingTheSelectedStudentSwapsTheVisibleRows()`.
+
+**Pengembangan yang masih diperlukan.**
+- Impor data siswa massal (CSV) — belum ada.
+- Pengelompokan siswa (misalnya per jenjang atau mata pelajaran) — belum ada.
+
+---
+
+### 5.6 E. Permintaan Koneksi Pengajar–Siswa
+
+**Pengertian dan kegunaan.**
+Modul ini menghubungkan dua pihak secara aman. Alurnya: pengajar membuat **kode undangan**, siswa memasukkan kode tersebut, pengajar menyetujui, dan baru setelah itu siswa dapat melihat data belajar yang dibuat pengajar.
+
+**Masalah yang dibantu.**
+- Mencegah siswa membuka data pengajar lain tanpa persetujuan.
+- Memberi pengajar kendali atas siapa yang boleh melihat materinya.
+- Menggantikan model "semua orang punya akses" yang tidak realistis untuk homeschooling.
+
+**Pengguna.** Pengajar (membuat kode, menyetujui/menolak) dan Siswa (mengajukan permintaan).
+
+**Informasi yang ditampilkan dan dikelola.**
+
+| Objek | Isi |
+|---|---|
+| `TeacherInvitation` | id, teacherAccountId, **codeHash** (SHA-256), createdAt, expiresAt, usedAt, status (`ACTIVE`/`USED`/`REVOKED`/`EXPIRED`) |
+| `TeacherConnectionRequest` | id, studentAccountId, teacherAccountId, invitationId, status (`PENDING`/`APPROVED`/`REJECTED`), createdAt, updatedAt |
+| `TeacherStudentConnection` | id, studentAccountId, teacherAccountId, status (`ACTIVE`/`REVOKED`/`ENDED`), createdAt, updatedAt |
+
+Format kode undangan: **36 karakter heksadesimal huruf besar** (18 byte acak dari `SecureRandom`). Kode hanya ditampilkan sekali saat dibuat; yang tersimpan di berkas hanyalah hash SHA-256-nya.
+
+**Cara penggunaan langkah demi langkah.**
+
+*Sisi pengajar:*
+1. Masuk sebagai pengajar → sidebar **Koneksi → Undangan**.
+2. Tekan **Buat kode undangan**. Dialog menampilkan kode 36 karakter dengan peringatan "Kode hanya ditampilkan sekali, simpan salinannya sekarang."
+3. Salin kode dan kirimkan ke siswa melalui kanal apa pun di luar aplikasi.
+4. Ketika siswa memakai kode, permintaan muncul di sidebar **Koneksi → Permintaan siswa**.
+5. Tekan **Setujui** atau **Tolak** pada baris yang dipilih.
+6. Bila kode masih aktif dan tidak diperlukan, tekan **Cabut kode**.
+
+*Sisi siswa:*
+1. Masuk sebagai siswa → sidebar **Koneksi → Koneksi pengajar**.
+2. Isi field kode undangan pada kartu "Kirim kode undangan", tekan **Kirim permintaan**.
+3. Status permintaan (Menunggu / Terhubung / Ditolak) tampil pada tabel riwayat.
+
+**Aturan penting yang berjalan di program:**
+- Kode berlaku **7 hari** (`ConnectionService.INVITATION_LIFETIME`); setelah lewat, statusnya otomatis menjadi `EXPIRED` dan kode tidak bisa dipakai.
+- **Kode tidak hangus ketika permintaan ditolak.** Kode baru menjadi `USED` setelah permintaan disetujui. Ini memungkinkan siswa mengajukan ulang setelah ditolak — hal ini diuji secara eksplisit pada `ConnectionFlowTest.invitationStaysUsableUntilApprovedAndCanBeReusedAfterRejection()`.
+- Pengajar tidak dapat menyetujui permintaan milik pengajar lain.
+- Kode yang sudah dipakai tidak dapat dipakai lagi.
+
+**Hubungan dengan fitur lain.**
+Relasi `ACTIVE` yang dihasilkan modul ini adalah **pintu masuk** ke seluruh data belajar: `LearningWorkspaceService.requireTeacherForStudent()` menolak setiap operasi baca/tulis bila relasi tidak `ACTIVE`. Jadi modul E adalah fondasi pembatasan akses pada modul F–K.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `ConnectionFlowTest` (7 test: undangan→permintaan→persetujuan, kode tetap aktif sampai disetujui, pengajuan ulang setelah penolakan, pengajar tidak dapat memproses permintaan milik pengajar lain, pembatasan peran, pencabutan relasi), `ConnectionServiceTest` (4 test: kode disimpan sebagai hash, kedaluwarsa ditandai, pembatasan peran).
+
+**Pengembangan yang masih diperlukan.**
+- Verifikasi dua langkah (kode melalui SMS/email) — belum ada.
+- Batas jumlah siswa per pengajar — belum ada.
+- Notifikasi otomatis ke pengajar saat ada permintaan baru — belum ada.
+
+---
+
+### 5.7 F. Mata Pelajaran
+
+**Pengertian dan kegunaan.**
+Mata pelajaran adalah entitas "induk" yang mengikat empat jenis record lain: materi, jadwal, tugas, dan evaluasi. Semua empat menyimpan `subjectId` yang menunjuk ke `Subject`.
+
+**Masalah yang dibantu.**
+- Mencegah data pembelajaran bertebaran tanpa kategori.
+- Memungkinkan laporan progres dihitung **per mata pelajaran**, bukan hanya angka total.
+
+**Pengguna.** Pengajar (CRUD), siswa (membaca).
+
+**Informasi yang ditampilkan.** Kolom tabel: **Mata pelajaran**, **Deskripsi**. Data disimpan pada `subjects.json` dengan field `id`, `name`, `description`.
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Pembelajaran → Mata pelajaran**.
+2. Tekan **Tambah** → isi nama mata pelajaran (wajib) dan deskripsi (opsional) → **Simpan**.
+3. Baris baru langsung muncul di tabel.
+4. Tekan **Edit** untuk mengubah, **Hapus** untuk menghapus.
+5. Bila mata pelajaran masih dipakai materi/jadwal/tugas/evaluasi, penghapusan ditolak dengan pesan "Mata pelajaran masih dipakai oleh materi, jadwal, tugas, atau evaluasi." — ini mencegah data yatim (dangling reference).
+
+**Hubungan dengan fitur lain.**
+Mata pelajaran adalah prasyarat: tombol tambah pada halaman Materi, Jadwal, Tugas, dan Evaluasi akan menampilkan pesan "Buat mata pelajaran terlebih dahulu." bila belum ada. Filter kolom "Mata pelajaran" pada halaman-halaman tersebut juga bersumber dari daftar mata pelajaran di cakupan siswa terpilih.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `AppShellSmokeTest.teacherTableShowsRepositoryDataAndSearchFiltersIt()`, `LearningWorkspaceFlowTest.subjectInUseCannotBeDeleted()`, `LearningWorkspaceFlowTest.teacherCreatesRecordsAndStudentSeesThem()`.
+
+**Pengembangan yang masih diperlukan.**
+- Kurikulum/tingkat sebagai induk mata pelajaran (misalnya Kurikulum Merdeka SMP) — belum ada.
+- Urutan/penomoran pelajaran — belum ada.
+- Pembagian satu mata pelajaran oleh dua pengajar — belum ada; ownership grant mengikat satu pasangan pengajar–siswa.
+
+---
+
+### 5.8 G. Jadwal Belajar
+
+**Pengertian dan kegunaan.**
+Menentukan kapan siswa belajar, dengan siapa, sejauh berapa, dan materi apa yang dibahas. Jadwal adalah acuan temporal untuk modul lain: tugas dan evaluasi diletakkan relatif terhadap jadwal, dan dashboard menampilkan "jadwal terdekat".
+
+**Masalah yang dibantu.**
+- Menghilangkan "jadwal_manual" yang tersebar di kertas atau pesan.
+- Memberi tahu siswa kapan harus belajar dan berapa lama.
+
+**Pengguna.** Pengajar (CRUD), siswa (membaca).
+
+**Informasi yang ditampilkan.** Kolom tabel: **Tanggal**, **Hari** (nama hari dalam bahasa Indonesia, misalnya "Rabu"), **Waktu**, **Mata pelajaran**, **Durasi** (menit), **Catatan**. Field `studentId` dan `teacherId` diisi otomatis oleh sistem saat disimpan, sehingga pengajar tidak perlu memilih identitas secara manual.
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Pembelajaran → Jadwal belajar**.
+2. Tekan **Tambah** → pilih mata pelajaran, isi tanggal (format `YYYY-MM-DD`), waktu mulai (format `HH:MM`), durasi dalam menit, dan catatan opsional.
+3. Tekan **Simpan**. Baris langsung tampil.
+4. Gunakan filter **Mata pelajaran** untuk melihat jadwal per mata pelajaran.
+
+**Cara mencegah data jadwal yang tidak valid.**
+Validasi dilakukan berlapis:
+- **Di model** (`StudySession`): tanggal dan waktu wajib diisi; durasi harus di antara 1 dan 1440 menit. Pelanggaran melempar `IllegalArgumentException` dengan pesan dalam bahasa Indonesia.
+- **Di service** (`LearningWorkspaceService.saveSession()`): mata pelajaran wajib sudah terdaftar pada cakupan siswa, `studentId` dipaksa menjadi siswa terpilih, `teacherId` dipaksa menjadi pengajar yang sedang masuk.
+- **Di UI** (`LearningTablePage.parseDate()`, `parseTime()`, `parseInteger()`): masukan pengguna yang tidak bisa di-parse ditolak dengan pesan "… harus berformat YYYY-MM-DD" / "HH:MM" / "harus berupa angka bulat" sebelum pernah menyentuh data.
+- **Di dialog** (`FormDialog`): field wajib yang kosong ditolak sebelum tombol Simpan mengaktifkan.
+
+**Hubungan dengan fitur lain.**
+- Jadwal menjadi salah satu sumber "aktivitas terbaru" di dashboard.
+- Jadwal dipakai untuk menghitung jumlah sesi pada kartu "Jadwal belajar" dan pada laporan progres.
+- Jadwal menentukan tampilan status "Terjadwal" atau "Selesai" pada feed aktivitas.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `LearningWorkspaceFlowTest.teacherCreatesRecordsAndStudentSeesThem()` (siswa melihat jadwal yang dibuat pengajar), `LearningActivityTest.activityFeedIsBuiltFromTheStoredRecords()`.
+
+**Pengembangan yang masih diperlukan.**
+- Jadwal berulang mingguan (misalnya "Setiap Senin dan Kamis") — belum ada; saat ini satu baris = satu tanggal.
+- Deteksi bentrok jadwal (dua sesi pada jam yang sama) — belum ada.
+- Pengingat sebelum sesi dimulai — belum ada.
+- Integrasi kalender sistem — belum ada.
+
+---
+
+### 5.9 H. Materi Pembelajaran
+
+**Pengertian dan kegunaan.**
+Materi adalah bahan belajar yang disiapkan pengajar. Modelnya dirancang agar materi **berguna di dalam aplikasi tanpa koneksi internet**: setiap materi membawa tujuan pembelajaran dan isi lengkap berisi penjelasan, contoh, dan latihan.
+
+**Masalah yang dibantu.**
+- Menggantikan kumpulan tautan dan berkas yang bertebaran.
+- Memastikan siswa bisa belajar mandiri dengan panduan yang jelas.
+
+**Pengguna.** Pengajar (CRUD), siswa (membaca).
+
+**Informasi yang ditampilkan.** Kolom tabel: **Judul**, **Mata pelajaran**, **Jenis**, **Ringkasan**. Dialog "Lihat materi" menampilkan: Judul, subjudul "Mata pelajaran …", lalu bagian **Tujuan pembelajaran**, **Materi**, **Ringkasan**, **Lokasi / URL**, dan badge penanda "Data demo" bila record dibuat oleh pembuat data contoh.
+
+Field pada `LearningMaterial`: `id`, `subjectId`, `title`, `type`, `location`, `notes`, `objectives`, `content`.
+
+**Contoh materi bawaan (dari `DemoDataService`):**
+
+| Mata pelajaran | Judul | Isi |
+|---|---|---|
+| Matematika | Menyelesaikan Persamaan Linear Satu Variabel | Bentuk umum ax + b = 0, langkah penyelesaian, 2 contoh soal (termasuk soal cerita), 5 soal latihan, dan kunci jawaban |
+| Bahasa Indonesia | Menyusun Teks Eksplanasi | Ciri teks eksplanasi, contoh "Proses Terjadinya Hujan", latihan menulis |
+| IPA | Sistem Pernapasan Manusia | Penjelasan organ, urutan aliran udara, dan latihan |
+| Bahasa Inggris | Writing a Descriptive Text | Struktur pembuka–elaborasi–penutup paragraf, latihan kosakata |
+| PJOK | Program Latihan Aerobik | Denyut nadi maksimum dan target, penyusunan program |
+| Seni Budaya | Motif Batik | Prinsip bentuk dasar berulang dan pewarnaan |
+| IPS | Dampak Perubahan Sosial | Analisis dampak positif dan negatif |
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Pembelajaran → Materi**.
+2. Pengajar: tekan **Tambah** → pilih mata pelajaran, isi judul, jenis, lokasi/URL, ringkasan, tujuan pembelajaran, dan isi materi (field multiline) → **Simpan**.
+3. Klik baris → tekan **Lihat materi** untuk membaca isi lengkap.
+4. Siswa: buka halaman Materi, klik baris, tekan **Lihat materi**. Tidak ada tombol tambah/edit/hapus untuk siswa.
+
+**Hubungan dengan fitur lain.**
+Materi terikat pada mata pelajaran. Jumlah materi ditampilkan pada dashboard ("Materi" sebagai hint kartu mata pelajaran) dan pada laporan progres. Materi juga dihitung pada `PersonSummary` untuk daftar orang.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `DemoDataServiceTest.everyMaterialCarriesUsableContent()` (memastikan setiap materi bawaan punya isi yang dapat dipakai), `LearningWorkspaceFlowTest.teacherCreatesRecordsAndStudentSeesThem()`, `LearningWorkspaceServiceTest.legacyIdsCannotBeClaimedAndMaterialAndEvaluationPersistWithinScope()`.
+
+**Pengembangan yang masih diperlukan.**
+- Lampiran berkas (PDF, gambar, video) — belum ada; saat ini hanya field teks "Lokasi atau URL".
+- Lampiran gambar di dalam materi (mendukung HTML) — belum ada.
+- Riwayat versi materi — belum ada.
+- Pencarian di dalam isi materi (hanya di kolom tabel) — belum ada.
+- Bisa diunduh sebagai PDF — belum ada.
+
+---
+
+### 5.10 I. Tugas
+
+**Pengertian dan kegunaan.**
+Tugas adalah pekerjaan yang harus diselesaikan siswa pada tenggat tertentu, lengkap dengan instruksi. Pengajar harus tahu tugas mana yang sudah dikerjakan.
+
+**Masalah yang dibantu.**
+- Menghilangkan daftar tugas yang hanya ada di kepala pengajar.
+- Memberi tenggat yang jelas sehingga keterlambatan dapat dikenali.
+
+**Pengguna.** Pengajar (CRUD), siswa (membaca dan menandai selesai).
+
+**Informasi yang ditampilkan.** Kolom tabel: **Tugas**, **Mata pelajaran**, **Siswa** (nama siswa target, di-resolve dari grant kepemilikan), **Tenggat**, **Status**. Kolom status diwarnai dengan *status pill* berwarna. Dialog "Lihat tugas" menampilkan: Instruksi, Tenggat, Siswa target, Status.
+
+Field pada `LearningTask`: `id`, `title`, `subjectId`, `dueDate`, `completed`, `instructions`.
+
+Tiga kemungkinan status dihitung otomatis oleh method `getStatusLabel()`:
+
+| Status | Kondisi |
+|---|---|
+| **Selesai** | `completed == true` |
+| **Terlambat** | belum selesai dan `dueDate` sudah lewat dari hari ini |
+| **Belum selesai** | belum selesai dan tenggat belum lewat |
+
+**Cara penggunaan langkah demi langkah.**
+*Pengajar:*
+1. Sidebar **Pembelajaran → Tugas**.
+2. Tekan **Tambah** → isi judul, pilih mata pelajaran, tentukan tenggat (`YYYY-MM-DD`), tulis instruksi → **Simpan**.
+3. Edit/hapus seperti biasa.
+
+*Siswa:*
+1. Buka halaman Tugas.
+2. Pilih baris tugas yang sudah dikerjakan.
+3. Tekan **Tandai selesai**. Konfirmasi muncul, status berubah menjadi "Selesai", dan baris langsung hilang dari daftar "Tugas terdekat" di dashboard.
+4. Tekan lagi untuk mengembalikan status.
+
+**Hubungan dengan fitur lain.**
+- Status tugas memengaruhi Dashboard (kartu "Tugas tertunda" dan "Tugas terdekat") dan Laporan progres ("Tugas selesai").
+- Tugas yang terlambat dihitung terpisah pada `ProgressReport.overdueTaskCount()`.
+- Tugas menjadi sumber entri feed "Aktivitas terbaru" pada kategori "Tugas".
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `LearningWorkspaceFlowTest.studentOnlyMarksOwnTaskAndOnlyTheCompletionFlag()` (siswa lain ditolak, dan hanya flag selesai yang boleh diubah), `DemoDataServiceTest.assignmentsCarryInstructionsAndDifferentStatuses()`, `ModelValidationTest.polymorphicStatusReflectsTaskAndGoalState()`.
+
+**Pengembangan yang masih diperlukan.**
+- Lampiran berkas pada tugas — belum ada.
+- Unggah jawaban/karya siswa — belum ada.
+- Berkas pengumpulan tugas per siswa (penilaian berkas) — belum ada.
+- Reminder tenggat — belum ada.
+- Tenggat jam dan tanggal (hanya tanggal) — belum ada.
+
+---
+
+### 5.11 J. Evaluasi dan Nilai
+
+**Pengertian dan kegunaan.**
+Mencatat hasil penilaian terhadap satu mata pelajaran pada satu tanggal, beserta nilai maksimum dan umpan balik tertulis.
+
+**Masalah yang dibantu.**
+- Menyimpan nilai di satu tempat, bukan di kertas yang mudah hilang.
+- Memberi umpan balik yang bisa dibaca siswa kapan saja.
+- Menyediakan data dasar untuk perhitungan rata-rata pada laporan progres.
+
+**Pengguna.** Pengajar (CRUD), siswa (membaca).
+
+**Informasi yang ditampilkan.** Kolom tabel: **Tanggal**, **Mata pelajaran**, **Nilai** (format "88.0 / 100.0"), **Persentase**, **Catatan**. Dialog "Lihat nilai" menampilkan: Nilai, Persentase, Catatan pengajar, Siswa.
+
+Field pada `Evaluation`: `id`, `subjectId`, `date`, `score`, `maximumScore`, `notes`.
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Pembelajaran → Evaluasi**.
+2. Tekan **Tambah** → pilih mata pelajaran, isi tanggal, nilai, nilai maksimum, dan catatan pengajar → **Simpan**.
+3. Persentase dihitung otomatis oleh `Evaluation.getPercentage()` = `score / maximumScore * 100`.
+4. Tekan **Lihat nilai** untuk membaca umpan balik lengkap.
+
+**Validasi nilai (menjaga konsistensi data).**
+`Evaluation.setScores()` menolak: nilai maksimum bukan bilangan berhingga, nilai maksimum nol atau negatif, nilai negatif, dan nilai yang melebihi nilai maksimum. Contoh pesan: "Nilai harus di antara 0 dan nilai maksimum yang lebih besar dari 0."
+
+**Hubungan dengan fitur lain.**
+- Evaluasi menjadi sumber perhitungan rata-rata nilai pada Dashboard, Laporan progres, dan Direktori.
+- Rincian per mata pelajaran pada halaman Laporan progres dibangun dengan menyaring evaluasi berdasarkan `subjectId`.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `EvaluationTest` (3 test: perhitungan persentase, penolakan nilai negatif/di atas maksimum, pembaruan nilai dan maksimum sebagai satu pasangan tervalidasi), `LearningWorkspaceFlowTest.progressReportReflectsRepositoryData()`.
+
+**Pengembangan yang masih diperlukan.**
+- Jenis penilaian (ulangan harian, quiz, tugas, ujian akhir) — belum ada; saat ini semua evaluasi tanpa kategori.
+- Komponen bobot penilaian — belum ada.
+- Skala nilai huruf (A–E) — belum ada; hanya persentase.
+- Lampiran rubrik penilaian — belum ada.
+- Riwayat perubahan nilai — belum ada.
+
+---
+
+### 5.12 K. Laporan Progres
+
+**Pengertian dan kegunaan.**
+Laporan progres merangkum capaian belajar seorang siswa dalam satu layar: berapa tugas yang selesai, berapa yang terlambat, berapa target yang tercapai, dan rata-rata nilainya, lengkap dengan rincian per mata pelajaran dan sebuah narasi ringkasan dalam bahasa Indonesia.
+
+**Masalah yang dibantu.**
+- Menggantikan pertanyaan manual "gimana progres anak saya?" yang memerlukan perhitungan panjang.
+- Menyediakan bahan laporan yang siap dicetak atau dibaca ke orang tua/wali.
+
+**Pengguna.** Pengajar dan siswa.
+
+**Informasi yang ditampilkan.**
+Empat kartu: **Tugas selesai** (selesai / total + persentase), **Target tercapai** (tercapai / total + persentase), **Rata-rata nilai** (persentase + jumlah evaluasi), **Materi** (jumlah + jumlah sesi).
+
+Dua tabel/panel di bawahnya:
+- **Ringkasan laporan** — paragraf naratif yang dihitung dari data (contoh: "Siswa ini belajar pada 7 mata pelajaran dengan 12 materi dan 8 sesi belajar. Dari 12 tugas, 5 sudah selesai (42%) dan 2 sudah melewati tenggat. Target belajar yang sudah tercapai 2 dari 4. Rata-rata nilai 86.0% dari 7 evaluasi.").
+- **Rincian per mata pelajaran** — tabel: Mata pelajaran, Tugas, Selesai, Evaluasi, Rata-rata.
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Pembelajaran → Laporan progres**.
+2. Pengajar: pilih siswa di bar atas. Laporan dihitung ulang otomatis.
+3. Baca kartu-kartu ringkasan dan narasi.
+4. Buka tabel rincian per mata pelajaran untuk melihat sebaran capaian.
+
+**Cara laporan dibuat dari data aktual.**
+Laporan disusun oleh `LearningWorkspaceService.progress(token, studentId)` yang:
+1. mengambil keenam jenis record yang boleh dilihat pemanggil;
+2. menghitung jumlah tugas selesai dan terlambat, target tercapai, jumlah evaluasi, dan rata-rata persentase nilai;
+3. mengelompokkan tugas dan evaluasi per mata pelajaran;
+4. mengembalikan objek `ProgressReport` (sebuah `record` Java yang immutable) beserta metode `summary()` yang menyusun narasi.
+
+Jadi **tidak ada angka hard-coded** di halaman ini. Hal ini dibuktikan oleh `LearningWorkspaceFlowTest.progressReportReflectsRepositoryData()` yang mencocokkan angka laporan dengan data yang baru dibuat di dalam test.
+
+**Keterbatasan laporan saat ini.**
+- Laporan hanya mencakup satu siswa pada satu waktu (tidak ada mode "kelompok").
+- Tidak ada filter periode (hanya seluruh riwayat).
+- Tidak ada grafik atau perbandingan antar-siswa.
+- Tidak ada ekspor/cetak.
+- Data yang sudah pernah dihapus tidak dapat direkonstruksi.
+
+**Hubungan dengan fitur lain.**
+Laporan progres memakai data yang sama dengan Dashboard dan Direktori, sehingga ketiganya selalu konsisten. Laporan juga menjadi tempat penghitungan angka yang dipakai `PersonSummary` pada halaman direktori.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `LearningWorkspaceFlowTest.progressReportReflectsRepositoryData()`, `LearningActivityTest.progressReportProducesAReadableSummary()`, `AppShellSmokeTest.dashboardAndProgressUseTheRepositoryData()`.
+
+**Pengembangan yang masih diperlukan.**
+- Filter rentang tanggal — belum ada.
+- Perbandingan antar-siswa — belum ada.
+- Ekspor PDF/Excel dan cetak — belum ada.
+- Grafik perkembangan nilai — belum ada.
+
+---
+
+### 5.13 L. Profil dan Pengaturan Akun
+
+**Pengertian dan kegunaan.**
+Halaman "Profil saya" menampilkan informasi akun yang sedang dipakai dan menyediakan dua tindakan: **ubah profil** dan **ubah kata sandi**.
+
+**Masalah yang dibantu.**
+- Data akun yang salah (misalnya nama salah ketik) harus bisa diperbaiki.
+- Pengguna harus dapat mengganti kata sandi tanpa bantuan administrator.
+
+**Pengguna.** Semua pengguna.
+
+**Informasi yang ditampilkan.** Nama lengkap, Email, Peran, Jenjang pendidikan, Status akun (selalu "Aktif" untuk akun yang berhasil masuk), dan Jenis data ("Akun demo" atau "Akun dibuat sendiri").
+
+**Cara penggunaan langkah demi langkah.**
+*Ubah profil:*
+1. Sidebar **Akun → Profil saya**.
+2. Tekan **Ubah profil** → ubah nama lengkap (wajib) dan jenjang pendidikan (opsional; hanya dipakai peran siswa) → **Simpan**.
+2. Dialog ditutup, nama pada bilah aplikasi ikut berubah, dan pesan "Profil diperbarui" tampil.
+
+*Ubah kata sandi:*
+1. Tekan **Ubah kata sandi**.
+2. Isi kata sandi saat ini, kata sandi baru, dan ulang kata sandi baru.
+3. Tekan **Simpan**. Bila konfirmasi tidak sama, dialog menampilkan galat dan tidak menutup.
+
+**Hubungan dengan fitur lain.**
+Perubahan nama langsung tercermin pada bilah identitas (`TopBar.accountChip`) karena `Workspace.refreshSession()` mengambil ulang ringkasan akun setelah penyimpanan. Perubahan kata sandi tidak mengeluarkan sesi; pengguna tetap masuk dengan token yang sama.
+
+**Status implementasi: SUDAH BERFUNGSI (sebagian).**
+Bukti: `AuthFlowTest.profileCanBeUpdatedAndPasswordChanged()`.
+
+**Pengembangan yang masih diperlukan.**
+- Pengaturan tampilan (tema terang/gelap, ukuran font) — belum ada; sistem warna bersifat token tunggal di `Theme`.
+- Preferensi notifikasi — belum ada.
+- Hapus akun sendiri — belum ada.
+- Unggah foto profil — belum ada.
+- Riwayat aktivitas login — belum ada.
+- Ekspor data pribadi — belum ada.
+
+---
+
+### 5.14 M. Target Belajar
+
+**Pengertian dan kegunaan.**
+Target adalah sasaran belajar yang ditetapkan pengajar dengan tanggal target, misalnya "Menguasai persamaan linear satu variabel sampai tingkat soal cerita" sebelum 30 hari dari sekarang. Target membuat kemajuan dapat diukur, bukan hanya dirasakan.
+
+**Masalah yang dibantu.**
+- Memberi arah dan batas waktu pada proses belajar.
+- Menyediakan ukuran pencapaian selain nilai.
+
+**Pengguna.** Pengajar (CRUD dan menandai tercapai), siswa (membaca).
+
+**Informasi yang ditampilkan.** Kolom tabel: **Target**, **Tanggal**, **Status** ("Tercapai" / "Dalam proses") dengan *status pill* berwarna. Filter kolom **Status** tersedia.
+
+**Cara penggunaan langkah demi langkah.**
+1. Sidebar **Pembelajaran → Target belajar**.
+2. Pengajar: tekan **Tambah** → isi deskripsi target dan tanggal target → **Simpan**.
+3. Pilih baris → tekan **Tandai tercapai**. Status berubah menjadi "Tercapai".
+4. Siswa: hanya dapat membaca; tombol **Tandai tercapai** tidak muncul bagi peran siswa.
+
+**Hubungan dengan fitur lain.**
+Target dihitung pada Dashboard (kartu "Target tercapai") dan Laporan progres (kartu "Target tercapai" serta narasi ringkasan). Target juga menjadi salah satu sumber feed aktivitas.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `LearningWorkspaceFlowTest.goalAchievementIsTeacherControlled()` — siswa yang mencoba menandai target **ditolak** dengan `SecurityException`, sementara pengajar boleh.
+
+**Pengembangan yang masih diperlukan.**
+- Target bertingkat (sub-target) — belum ada.
+- Kurva kemajuan menuju target — belum ada.
+- Target otomatis dari nilai (misalnya "nilai minimal 80") — belum ada.
+
+---
+
+### 5.15 N. Data Contoh (Demo)
+
+**Pengertian dan kegunaan.**
+Saat aplikasi pertama kali dijalankan, `DemoDataService` membuat data contoh sehingga tidak ada satu pun halaman yang tampil kosong saat demo. Data contoh berupa akun, relasi koneksi, dan kurikulum lengkap.
+
+**Masalah yang dibantu.**
+- Tanpa data contoh, penilai tidak dapat melihat fungsi aplikasi karena semua tabel kosong.
+- Setelah data contoh dihapus, data tersebut tidak boleh muncul kembali secara mengganggu.
+
+**Pengguna.** Setiap pengguna yang menjalankan aplikasi di komputer yang datanya masih kosong.
+
+- **Strip "Akun demo siap pakai"** yang memuat daftar email dan kata sandi akun demo, sehingga akun demo bisa langsung dicoba tanpa mengetik.
+
+**Akun demo bawaan (`DemoDataService`):**
+
+| Peran | Nama | Email | Kata sandi |
+|---|---|---|---|
+| Pengajar | Rani Puspita | `rani@demo.test` | `DemoGuru2024!` |
+| Pengajar | Bagus Wicaksono | `bagus@demo.test` | `DemoGuru2024!` |
+| Pengajar | Siti Nurhaliza | `siti@demo.test` | `DemoGuru2024!` |
+| Siswa | Dimas Ardi | `dimas@demo.test` | `DemoSiswa2024!` |
+| Siswa | Nadia Putri | `nadia@demo.test` | `DemoSiswa2024!` |
+| Siswa | Yusuf Maulana | `yusuf@demo.test` | `DemoSiswa2024!` |
+| Siswa | Aulia Rahma | `aulia@demo.test` | `DemoSiswa2024!` |
+
+Jenjang pendidikan siswa demo: Dimas (SMA), Nadia (SMP), Yusuf (SMP), Aulia (SD).
+
+**Cara data contoh disediakan.**
+1. `Main.main()` memanggil `demo.seedIfNeeded()` sebelum jendela ditampilkan.
+2. `seedIfNeeded()` menjalankan tiga langkah: `ensureAccounts()` membuat akun yang belum ada, `connectAccounts()` menjalankan siklus undangan nyata untuk membuat relasi (4 relasi `ACTIVE`, 1 permintaan `PENDING`, 1 permintaan `REJECTED` — sengaja, agar kedua status terlihat saat demo), dan `seedCurricula()` membuat record belajar untuk siswa yang belum punya data.
+3. Seluruh ID akun dan record demo dicatat di berkas penanda **`demo-data.json`** (`DemoMarkers`).
+
+**Cara mencegah data contoh menimpa data pengguna.**
+Mekanismenya berlapis:
+- **Akun** dicocokkan berdasarkan alamat email. Akun dengan email yang sudah ada **tidak** dibuat ulang dan **tidak** diubah.
+- **Record belajar** hanya dibuat untuk siswa yang belum punya satu pun grant. Siswa yang sudah punya data miliknya sendiri tidak diberi data contoh.
+- **Marker file** `demo-data.json` mencatat apa saja yang sudah dibuat, sehingga proses seeding tidak berulang.
+- **Penghapusan tidak dibatalkan.** Bila pengguna menghapus record demo, record itu tidak muncul kembali pada proses berikutnya.
+
+Hal ini diuji oleh `DemoDataServiceTest.seedingIsNotRepeatedAndUserDataIsNotOverwritten()`.
+
+**Hubungan dengan fitur lain.**
+Data contoh membuat seluruh fitur lain dapat langsung didemonstrasikan: Dashboard terisi, filter mata pelajaran punya isi, dan status tugas sudah bervariasi (ada yang "Selesai", ada yang "Terlambat", ada yang "Belum selesai").
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `DemoDataServiceTest` (6 test: seeding membuat akun/koneksi/record, setiap materi punya isi yang dapat dipakai, tugas punya instruksi dan status berbeda, seeding tidak berulang dan data pengguna tidak ditimpa, record demo ditandai sehingga bisa dibedakan, siswa tidak dapat menjangkau siswa lain lewat data demo).
+
+**Pengembangan yang masih diperlukan.**
+- Tombol "muat ulang data demo" dari dalam aplikasi — belum ada; saat ini data demo hanya dibuat otomatis saat penyimpanan masih kosong.
+- Hapus data demo dari dalam aplikasi — belum ada; harus dilakukan manual dengan menutup aplikasi dan memindahkan berkas.
+
+---
+
+### 5.16 O. Pencarian dan Filter Kolom
+
+**Pengertian dan kegunaan.**
+Setiap tabel data memiliki kotak pencarian teks dan satu atau beberapa dropdown filter. Ini adalah lapisan usability yang membuat data yang banyak tetap dapat dikelola.
+
+**Masalah yang dibantu.**
+- Mencari satu record di antara banyak baris.
+- Melihat hanya data yang relevan (misalnya hanya tugas satu mata pelajaran).
+
+**Pengguna.** Semua pengguna.
+
+**Informasi yang ditampilkan.** Kolom pencarian menerima teks bebas dan mencocokkan secara *case-insensitive* terhadap seluruh nilai sel pada baris tersebut. Tombol dropdown filter selalu memuat pilihan pertama "Semua …" (misalnya "Semua mata pelajaran").
+
+**Cara penggunaan langkah demi langkah.**
+1. Ketik di kotak "Cari" pada tabel — hasil difilter seketika.
+2. Gunakan dropdown di sisi kiri baris tabel untuk memilih filter (Mata pelajaran, Jenjang, Status).
+3. Kosongkan pencarian untuk mengembalikan seluruh baris.
+
+**Hubungan dengan fitur lain.**
+Disediakan oleh komponen generik `DataTable<T>` yang dipakai bersama oleh semua halaman data, sehingga perilaku pencarian konsisten di seluruh aplikasi.
+
+**Status implementasi: SUDAH BERFUNGSI.**
+Bukti: `AppShellSmokeTest.teacherTableShowsRepositoryDataAndSearchFiltersIt()` yang menguji pencarian dengan kata yang cocok, kata yang tidak cocok, dan mengosongkan kembali.
+
+**Pengembangan yang masih diperlukan.**
+- Pencarian di dalam kolom multiline (isi materi, instruksi tugas) — belum ada; pencarian hanya mencocokkan teks sel tabel yang ditampilkan.
+- Pencarian fuzzy atau toleran typo — belum ada.
+- Urutan kolom yang dapat diklik (sort) — sudah ada pengurutan bawaan `TableRowSorter`, tetapi belum ada indikator arah pada header.
+
+---
+
+### 5.17 P. Arsip Data Pra-Akun
+
+**Pengertian dan kegunaan.**
+Project ini pernah memiliki versi lebih awal yang menyimpan siswa dan pengajar tanpa sistem akun. Data lama tersebut (`students.json`, `teachers.json`, `profile.json`) masih dibaca dan ditampilkan sebagai **arsip baca-saja** di bagian bawah halaman Data siswa dan Data pengajar.
+
+**Masalah yang dibantu.**
+- Data lama tidak hilang diam-diam.
+- Migrasi data lama ke sistem akun tidak dilakukan otomatis, dan itu memang disengaja.
+
+**Pengguna.** Pengajar dan siswa (hanya membaca).
+
+**Informasi yang ditampilkan.**
+Tabel arsip "Arsip data lokal" dengan keterangan "Catatan tersimpan sebelum sistem akun digunakan. Data ini hanya dapat dibaca."
+- Mode pengajar: Nama, Email, Telepon, Bidang keahlian.
+- Mode siswa: Nama, Email, Telepon, Tanggal lahir, Jenjang, Preferensi belajar.
+
+**Cara penggunaan langkah demi langkah.**
+1. Buka halaman **Data siswa** atau **Data pengajar**.
+2. Bila berkas arsip berisi data, tabel arsip tampil di bawah tabel utama.
+3. Tabel arsip **tidak memiliki** tombol tambah, edit, atau hapus.
+
+**Mengapa data lama tidak diimpor otomatis.**
+Data lama tidak memuat hash kata sandi dan tidak memuat identitas pemilik akun yang dapat diverifikasi. Mengimpornya secara otomatis berisiko memberikan akses data kepada akun yang salah. Karena itu record lama yang tidak memiliki *ownership grant* **tidak muncul** di halaman modul belajar (`LearningWorkspaceFlowTest.legacyRecordsWithoutGrantStayInvisible()`), dan tidak dapat "diklaim" memakai ulang ID yang sama (`LearningWorkspaceService.save()` melempar `SecurityException` untuk kasus itu).
+
+**Hubungan dengan fitur lain.**
+Menjadi bukti nyata perbedaan antara "data arsip" dan "data belajar yang aktif", sekaligus memperlihatkan cara kerja mekanisme grant.
+
+**Status implementasi: SUDAH BERFUNGSI (hanya baca).**
+Bukti: `LearningWorkspaceServiceTest.legacyRecordsWithoutGrantStayInvisible()`, `LearningWorkspaceFlowTest.legacyRecordsWithoutGrantStayInvisible()`, `AppShellSmokeTest.directoryPagesListTheConnectedPeople()`.
+
+**Pengembangan yang masih diperlukan.**
+- Alat migrasi yang memindahkan data lama ke akun setelah verifikasi manual — belum ada.
+- Pembersihan arsip dari UI — belum ada.
+
+---
+
+### 5.18 Q, R, S, T — Fitur yang Direncanakan
+
+Keempat fitur berikut **belum ada di dalam source code**. Semuanya sudah masuk rencana UAS (lihat Bab 13), dan sengaja dicatat di sini agar tidak ada Menu yang dikira sudah ada.
+
+| Kode | Fitur | Ide | Alasan belum dikerjakan |
+|---|---|---|---|
+| Q | Ekspor laporan / cetak | Ekspor laporan progres ke PDF atau Excel, atau dicetak | Memerlukan pustaka eksternal atau penyusun PDF manual; prioritas lebih rendah dibanding finishing modul inti. |
+| R | Pengingat tenggat tugas | Notifikasi pop-up ketika tugas mendekati atau melewati tenggat | Memerlukan mekanisme timer yang berjalan saat aplikasi terbuka dan bisa menampilkan notifikasi. |
+| S | Lampiran berkas pada materi | Unggah PDF/gambar/video sebagai lampiran materi | Memerlukan kerja sama penyimpanan berkas di luar JSON dan penanganan ukuran berkas. |
+| T | Verifikasi pendaftaran pengajar oleh admin | Peran `ADMIN` yang menyetujui pendaftaran pengajar | Menuntut penambahan peran, halaman admin, dan alur persetujuan baru. |
+
+---
+## BAB 6 — Alur Penggunaan Aplikasi Secara Keseluruhan
+
+### 6.1 Alur Utama: Pengajar
+
+| # | Langkah | Yang Terjadi di Program | Status |
+|---|---|---|---|
+| 1 | Pengguna membuka aplikasi | `Main.main()` mengatur Look and Feel sistem, membuat `ApplicationRepositories` pada direktori data pengguna, menyusun seluruh service, lalu memanggil `demo.seedIfNeeded()` untuk mengisi data contoh bila penyimpanan masih kosong. Jendela `MainFrame` tampil. | Sudah berfungsi |
+| 2 | Pengguna membuat akun atau masuk | `AuthScreen` menampilkan formulir masuk dan tautan pendaftaran. Registrasi membuat `UserAccount` dengan hash PBKDF2; login mengembalikan `UserSession` berisi token. | Sudah berfungsi |
+| 3 | Aplikasi mengenali peran pengguna | `SessionRegistry.requireAccount(token)` membaca akun aktif. Peran (`PENGAJAR`/`SISWA`) menentukan menu sidebar, cakupan data, dan hak akses. | Sudah berfungsi |
+| 4 | Pengguna masuk ke halaman yang sesuai | `MainFrame.showApplication()` mengganti kartu "auth" dengan kartu "app" berisi `AppShell`. `AppShell.buildNavigation()` mendaftarkan halaman sesuai peran: pengajar mendapat "Permintaan siswa" dan "Undangan"; siswa mendapat "Koneksi pengajar". | Sudah berfungsi |
+| 5 | Pengajar terhubung dengan siswa | Pengajar membuat kode undangan di halaman "Undangan"; siswa mengirim permintaan di halaman "Koneksi pengajar"; pengajar menyetujui di halaman "Permintaan siswa". Relasi `ACTIVE` terbentuk. | Sudah berfungsi |
+| 6 | Pengajar mengelola informasi pembelajaran | Pada modul mata pelajaran, jadwal, materi, tugas, target, dan evaluasi, pengajar menambah, mengubah, dan menghapus record untuk siswa terpilih. Setiap penyimpanan membuat *ownership grant*. | Sudah berfungsi |
+| 7 | Siswa menerima dan memakai datanya | Siswa login, membuka modul yang sama dalam mode baca, membaca materi, dan menandai tugas yang selesai. | Sudah berfungsi |
+| 8 | Hasil evaluasi dicatat dan ditampilkan sesuai hak akses | Pengajar menyimpan `Evaluation`; siswa melihatnya pada halaman Evaluasi dan pada kartu "Rata-rata nilai" di dashboard. | Sudah berfungsi |
+| 9 | Data digunakan untuk merangkum progres | `LearningWorkspaceService.progress()` menghitung laporan; dashboard dan halaman Laporan progres menampilkannya. | Sudah berfungsi |
+| 10 | Pengguna keluar | Tombol "Keluar" menghapus token sesi dan mengembalikan aplikasi ke layar masuk. | Sudah berfungsi |
+
+### 6.2 Alur Utama: Siswa
+
+| # | Langkah | Keterangan |
+|---|---|---|
+| 1 | Siswa membuka aplikasi dan masuk | Sama seperti pengajar; peran ditentukan oleh akun. |
+| 2 | Siswa melihat menu yang sesuai | Sidebar siswa tidak memuat "Permintaan siswa" dan "Undangan". Cakupan data siswa otomatis adalah dirinya sendiri (`Workspace` menetapkan `studentId = session.accountId()`). |
+| 3 | Siswa mengajukan koneksi | Halaman "Koneksi pengajar" menampilkan formulir kode undangan dan tabel riwayat permintaan. |
+| 4 | Siswa menunggu persetujuan | Status permintaan berubah dari "Menunggu" menjadi "Terhubung" setelah pengajar menyetujui. |
+| 5 | Siswa memakai materinya | Halaman Materi, Jadwal, Tugas, Target, dan Evaluasi menampilkan data yang ditautkan padanya. |
+| 6 | Siswa menandai tugas selesai | Tombol "Tandai selesai" mengubah flag pada tugas miliknya. |
+| 7 | Siswa memantau progresnya | Dashboard dan Laporan progres menampilkan angka dan narasi ringkasan. |
+
+### 6.3 Diagram Alur (Mermaid)
+
+**Alur autentikasi dan masuk ke aplikasi**
+
+```mermaid
+flowchart TD
+    A[Jalankan id.edu.homeschool.Main] --> B[ApplicationRepositories<br/>membuka direktori data]
+    B --> C[DemoDataService.seedIfNeeded<br/>isi data contoh bila kosong]
+    C --> D[MainFrame menampilkan AuthScreen]
+    D --> E{Sudah punya akun?}
+    E -- Tidak --> F[Formulir Daftar]
+    F --> G{Email sudah dipakai?}
+    G -- Ya --> H[Galat: email sudah terdaftar]
+    H --> F
+    G -- Tidak --> I[Hash kata sandi PBKDF2<br/>simpan UserAccount]
+    I --> J[Kembali ke layar masuk]
+    E -- Ya --> K[Formulir Masuk]
+    J --> K
+    K --> L{Email dan kata sandi benar<br/>dan akun ACTIVE?}
+    L -- Tidak --> M[Galat: email atau kata sandi tidak valid]
+    M --> K
+    L -- Ya --> N[SessionRegistry membuat token sesi]
+    N --> O[AppShell dibangun sesuai peran]
+    O --> P[Dashboard terbuka]
+```
+
+**Alur koneksi pengajar dan siswa**
+
+```mermaid
+sequenceDiagram
+    participant P as Pengajar
+    participant S as Siswa
+    participant CS as ConnectionService
+    participant WS as LearningWorkspaceService
+
+    P->>CS: createInvitation(token)
+    CS-->>P: kode 36 karakter (hanya ditampilkan sekali)<br/>disimpan hash SHA-256
+    P->>S: kode dibagikan di luar aplikasi
+    S->>CS: requestConnection(tokenSiswa, kode)
+    CS-->>S: permintaan berstatus PENDING
+    P->>CS: pendingForTeacher(token)
+    CS-->>P: daftar permintaan menunggu
+    P->>CS: approve(token, requestId)
+    CS-->>P: relasi status ACTIVE + kode menjadi USED
+    P->>S: siswa kini dapat membaca data
+    S->>WS: materials(tokenSiswa, studentId)
+    WS-->>S: data yang di-grant untuk siswa tersebut
+```
+
+**Alur akses data belajar (pintu masuk ke seluruh modul F sampai K)**
+
+```mermaid
+flowchart LR
+    A[Permintaan baca atau tulis] --> B[SessionRegistry.requireAccount]
+    B --> C{Peran apa?}
+    C -- Siswa --> D{studentId == akun ini?}
+    D -- Tidak --> X[SecurityException<br/>Anda tidak memiliki akses untuk data ini]
+    D -- Ya --> F
+    C -- Pengajar --> E{Relasi status ACTIVE<br/>dengan siswa ini?}
+    E -- Tidak --> X
+    E -- Ya --> F{Ada ownership grant<br/>yang cocok?}
+    F -- Tidak --> Y[Data tidak ditemukan / tidak tampil]
+    F -- Ya --> G[Baca atau tulis diteruskan ke Repository]
+    G --> H[JsonRepository menulis berkas JSON<br/>secara atomik]
+```
+
+### 6.4 Alur yang Sudah Terverifikasi vs Yang Masih Rencana
+
+| Alur | Status | Bukti |
+|---|---|---|
+| Registrasi, login, logout | Sudah berfungsi | `AuthFlowTest`, `AuthScreenTest` |
+| Pembuatan kode undangan | Sudah berfungsi | `ConnectionServiceTest.codeIsStoredAsHashStudentRequestsAndTeacherApprovalCreatesActiveRelation()` |
+| Permintaan koneksi oleh siswa | Sudah berfungsi | `ConnectionFlowTest.invitationRequestApprovalAndActiveRelation()` |
+| Persetujuan dan penolakan oleh pengajar | Sudah berfungsi | `ConnectionFlowTest`, `ConnectionServiceTest` |
+| Pembuatan materi, tugas, jadwal, evaluasi oleh pengajar | Sudah berfungsi | `LearningWorkspaceFlowTest.teacherCreatesRecordsAndStudentSeesThem()` |
+| Pembacaan data oleh siswa | Sudah berfungsi | `LearningWorkspaceFlowTest.studentCannotReadAnotherStudentAndCannotWriteAnything()` |
+| Edit dan hapus record | Sudah berfungsi | `LearningWorkspaceFlowTest.recordsCanBeEditedAndDeletedAndTheTableSeesTheChange()` |
+| Penghitungan laporan progres | Sudah berfungsi | `LearningWorkspaceFlowTest.progressReportReflectsRepositoryData()` |
+| Persistensi data setelah aplikasi ditutup | Sudah berfungsi | `LearningWorkspaceFlowTest.recordsSurviveApplicationRestart()` |
+| Pengiriman notifikasi ke pengajar saat ada permintaan | **Direncanakan** | Tidak ada kelas notifikasi di project |
+| Verifikasi two-step / OTP | **Direncanakan** | Tidak ada di project |
+| Ekspor laporan | **Direncanakan** | Tidak ada di project |
+
+---
+## BAB 7 — Teknologi yang Digunakan
+
+### 7.1 Ringkasan Teknologi
+
+| Teknologi | Versi / Sumber | Fungsi dalam Proyek | Alasan Dipilih |
+|---|---|---|---|
+| **Java** | 21 (Temurin 21.0.12.1) | Bahasa pemrograman seluruh aplikasi | Sesuai kurikulum OOP; mendukung class, interface, abstract class, generics, record, dan pola modern. |
+| **Java Swing** | Bagian dari JDK (`java.desktop`) | Seluruh antarmuka pengguna | Tersedia tanpa dependensi tambahan; mendukung penggambaran kustom lewat `Graphics2D` sehingga gaya visual bisa dibuat sendiri. |
+| **Logo vektor** | `AppLogo` (Java2D) | Logo aplikasi: mark "H" glossy dan wordmark "HomeLearn" | Tetap tajam di semua resolusi, tanpa berkas biner; dapat digantikan artwork PNG tanpa ubah kode. |
+| **Apache NetBeans** | IDE | Mengelola project Maven, menulis kode, menjalankan aplikasi | Tersedia di lingkungan kuliah dan sudah mendukung project Maven secara bawaan. |
+| **Apache Maven** | 3.9.16 (lewat Maven Wrapper) | Build, management dependensi, dan pengujian otomatis | Standar de-facto untuk project Java; deklaratif lewat `pom.xml`. |
+| **Maven Wrapper** | `mvnw.cmd`, `mvnw` | Menyediakan Maven tanpa harus memasangnya | mahasiswa tidak perlu memasang Maven; cukup repository lokal Maven sudah ada. |
+| **Jackson Databind** | 2.18.3 | Serialisasi dan deserialisasi objek ke/dari JSON | Menghemat kode dibandingkan menulis kode serialisasi secara manual; mendukung anotasi dan `JavaTimeModule` untuk `LocalDate`/`LocalTime`/`Instant`. |
+| **Jackson Datatype JSR-310** | 2.18.3 | Serialisasi objek `java.time` | Tanpa modul ini, `LocalDate` akan muncul sebagai angka/objek aneh, bukan "2026-10-20". |
+| **JUnit Jupiter** | 5.11.4 | Kerangka pengujian otomatis | Standar de-facto untuk pengujian unit dan integrasi pada Java modern; mendukung `@TempDir` untuk direktori uji sementara. |
+| **Java Time API** | JDK | `LocalDate`, `LocalTime`, `Instant`, `Duration`, `Clock` | Mendukung tanggal, waktu, masa berlaku undangan, dan **jam yang dapat di-inject** lewat `Clock` agar pengujian deterministik. |
+| **Java Security (JDK)** | JDK | `SecureRandom`, `MessageDigest` (SHA-256), `SecretKeyFactory` (PBKDF2) | Menyediakan primitives kriptografi yang sudah diaudit, tanpa perlu library pihak ketiga. |
+| **java.awt / javax.swing 2D** | JDK | `Graphics2D`, `GradientPaint`, `RadialGradientPaint`, `Path2D`, `BasicStroke` | Dasar dari seluruh tampilan kustom (kaca frosted, ikon vektor, tombol). |
+| **Aturan hash kata sandi** | PBKDF2-HMAC-SHA256, 210.000 iterasi, salt 16 byte acak, kunci 256 bit | Menyimpan kata sandi tanpa menyimpan kata sandi itu sendiri | Standar yang direkomendasikan untuk penyimpanan kata sandi satu arah. |
+
+### 7.2 Mengapa Java Swing?
+
+1. **Tersedia di JDK tanpa biaya atau dependensi.** Tidak ada masalah lisensi yang perlu dijelaskan saat presentasi.
+2. **Sesuai fokus mata kuliah.** Java Swing memaksa developer memisahkan concerns: komponen tampilan tidak boleh berisi aturan bisnis, dan aturan bisnis tidak boleh tahu tentang `JTable` atau `JFrame`. Pemisahan inilah yang diwajibkan oleh arsitektur `Model → Service → Repository → UI` pada Bab 8.
+3. **Mendukung penggambaran kustom.** `Graphics2D` memungkinkan aplikasi menggambar sendiri ikon, tombol, dan permukaan ("glass") alih-alih memakai tema bawaan. Ini membuat prototipe terlihat matang tanpa library UI yang berat.
+4. **Cukup untuk kebutuhan prototipe.** Kebutuhan aplikasi ini adalah satu pengguna desktop pada satu komputer, dengan data lokal. Bila nanti dibutuhkan banyak pengguna sekaligus, barulah arsitektur perlu berubah ke client-server.
+
+### 7.3 Mengapa Maven?
+
+- **Build reproducible.** Satu `pom.xml` menentukan versi Java, versi library, dan plugin. Siapa pun dengan JDK 21 yang sama akan memperoleh hasil build yang sama.
+- **Pengujian otomatis terpasang.** `mvn test` menjalankan seluruh test JUnit dan menghasilkan laporan HTML/XML di `target/surefire-reports/`.
+- **Eksekusi mudah.** `mvn exec:java` menjalankan `id.edu.homeschool.Main` tanpa perlu menyebut classpath secara manual.
+- **Wrapper bawaan.** `mvnw.cmd` mengunduh Maven 3.9.16 ke folder lokal pengguna sehingga tidak perlu memasang Maven secara terpisah.
+
+### 7.4 Mengapa JSON, Bukan Database SQL?
+
+Project ini **tidak memakai database SQL sama sekali**. Tidak ada driver JDBC, tidak ada `Connection`, tidak ada `PreparedStatement`, dan tidak ada string SQL di seluruh source code.
+
+Alasannya:
+
+1. **Cukup untuk lingkup prototipe.** Data yang dikelola adalah daftar sederhana (mata pelajaran, tugas, jadwal, dan sejenisnya) tanpa kebutuhan query gabungan yang rumit.
+2. **Mudah diperiksa saat demo.** berkas JSON dapat dibuka di teks editor dan ditampilkan langsung, sehingga dosen dapat melihat struktur data tanpa alat bantu.
+3. **Tidak menambah dependensi dan konfigurasi.** SQLite memerlukan driver native; PostgreSQL/MySQL memerlukan server. Keduanya akan menambah beban setup di tengah semester.
+4. **Tetap dapat diganti.** Lapisan repository sudah dipisah lewat interface `Repository<T>`. Mengganti JSON dengan JDBC pada tahap UAS cukup dilakukan dengan menuliskan `JdbcRepository<T>` baru — kode service dan UI tidak perlu berubah sama sekali. Inilah alasan abstraksi `Repository<T>` dibuat.
+
+**Perbedaan penting yang harus dipahami:** penyimpanan JSON **bukan** database relasional.
+- Tidak ada tabel, kolom, kunci asing, indeks, atau constraint.
+- Relasi antar data direpresentasikan **sebagai field ID** (misalnya `subjectId`, `studentAccountId`), bukan sebagai *foreign key* yang dijaga mesin.
+- Konsistensi relasi dijaga **secara manual oleh kode aplikasi** (contoh: `LearningWorkspaceService.requireSubject()` menolak menyimpan materi yang mata pelajarannya belum terdaftar).
+- Tidak ada transaksi lintas berkas. Bila aplikasi mati saat menulis dua berkas berbeda, dapat terjadi ketidakkonsistenan sementara.
+- Tidak ada Query language. Pencarian dan penyaringan dilakukan di dalam memori Java menggunakan stream.
+
+### 7.5 Konfigurasi Build (`pom.xml`)
+
+```xml
+<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <jackson.version>2.18.3</jackson.version>
+    <junit.version>5.11.4</junit.version>
+</properties>
+```
+
+Plugin yang digunakan:
+
+| Plugin | Versi | Fungsi |
+|---|---|---|
+| `maven-compiler-plugin` | 3.13.0 | Mengompilasi sumber Java dengan level 21 |
+| `maven-surefire-plugin` | 3.5.4 | Menjalankan test JUnit 5 dan menghasilkan laporan |
+| `exec-maven-plugin` | 3.5.0 | Menjalankan `id.edu.homeschool.Main` lewat `mvn exec:java` |
+
+Konfigurasi `exec-maven-plugin` menetapkan main class secara eksplisit:
+
+```xml
+<configuration>
+    <mainClass>id.edu.homeschool.Main</mainClass>
+</configuration>
+```
+
+### 7.6 Library Tambahan yang Ditemukan
+
+Hanya **tiga** dependensi runtime, semuanya tercatat di `pom.xml`:
+
+```text
+com.fasterxml.jackson.core:jackson-databind:2.18.3
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3
+org.junit.jupiter:junit-jupiter:5.11.4  (scope: test)
+```
+
+Tidak ada library untuk GUI, database, logging, atau validasi. Validasi ditulis sendiri; logging memakai `System.err.println` pada satu-dua tempat.
+
+---
+## BAB 8 — Penerapan Object-Oriented Programming
+
+Bab ini adalah inti Ujian UTS. Setiap konsep dijelaskan lebih dulu secara sederhana, lalu ditunjukkan **langsung pada kode yang benar-benar ada di project ini**, disertai nama class dan nama method.
+
+Ringkasan penerapannya:
+
+| Konsep OOP | Penerapan di Project | Status |
+|---|---|---|
+| Class | 80 class di 5 package | Terpasang |
+| Object | Instans dari model dan service dibuat di banyak tempat | Terpasang |
+| Attribute | Field `private` pada seluruh class model | Terpasang |
+| Method | Lebih dari 500 method pada model, service, repository, dan UI | Terpasang |
+| Constructor | 80+ constructor, termasuk constructor default Jackson | Terpasang |
+| Encapsulation | Field `private` + getter/setter tervalidasi | Terpasang |
+| Inheritance | `Pengguna` → `Siswa`/`Pengajar`; `LearningItem` → `LearningTask`/`LearningGoal` | Terpasang |
+| Polymorphism | Overriding method, interface `Repository<T>`, interface `Refreshable`, enum dengan `switch` exhaustive | Terpasang |
+| Abstraction | 2 abstract class, 2 interface, dan generics pada `DataTable<T>` | Terpasang |
+
+---
+
+### 8.1 A. Class
+
+**Pengertian.**
+Class adalah *blueprint* (cetak biru) — sebuah templat yang menjelaskan data apa yang dimiliki sebuah objek dan perilaku apa yang bisa dilakukan. Dalam Java, class dideklarasikan dengan kata kunci `class`, berisi **atribut** (state) dan **method** (perilaku).
+
+**Analogi sederhana.** Class `Subject` adalah cetakan formulir "Mata Pelajaran". Yang tersimpan di Lemari adalah *objek*-objek sebenarnya: satu cetakan untuk "Matematika", satu untuk "IPA", dan seterusnya.
+
+**Class yang benar-benar ada di dalam project:**
+
+| Package | Jumlah | Class utama dan tanggung jawabnya |
+|---|---|---|
+| `model` | 22 | Merepresentasikan data dan aturan validasi data itu sendiri. Tidak tahu apa pun tentang Swing maupun berkas JSON. |
+| `repository` | 4 | Menyediakan cara membaca dan menulis data ke media penyimpanan. |
+| `service` | 18 | Memuat aturan bisnis: siapa boleh apa, dan bagaimana sebuah record diproses. |
+| `ui` | 18 | Menampilkan informasi dan menerjemahkan aksi pengguna menjadi panggilan service. |
+| `ui.design` | 18 | Menyediakan token visual, logo aplikasi, dan komponen Swing generik yang dipakai ulang. |
+
+**Contoh: class model beserta tanggung jawabnya:**
+
+| Class | Tanggung jawab |
+|---|---|
+| `Subject` | Mata pelajaran; induk dari materi, jadwal, tugas, dan evaluasi. |
+| `LearningMaterial` | Materi belajar beserta tujuan dan isi lengkap. |
+| `StudySession` | Satu sesi belajar terjadwal. |
+| `LearningTask` | Tugas beserta instruksi, tenggat, dan status pengerjaan. |
+| `LearningGoal` | Target belajar beserta tanggal sasaran dan status pencapaian. |
+| `Evaluation` | Hasil penilaian beserta nilai, nilai maksimum, dan umpan balik. |
+| `UserAccount` | Identitas akun, peran, status, dan hash kata sandi. |
+| `TeacherInvitation` | Kode undangan berumur terbatas milik seorang pengajar. |
+| `TeacherConnectionRequest` | Permintaan koneksi dari siswa ke pengajar. |
+| `TeacherStudentConnection` | Relasi pengajar–siswa beserta statusnya. |
+| `LearningAccessGrant` | Ownership record yang menautkan satu record belajar ke pasangan pengajar–siswa. |
+| `Pengguna` | Abstract base untuk identitas dan kontak orang. |
+| `Siswa` | Orang yang berperan sebagai siswa. |
+| `Pengajar` | Orang yang berperan sebagai pengajar. |
+| `StudentProfile` | Model profil siswa versi lama; dipertahankan untuk kompatibilitas arsip. |
+
+**Contoh class service beserta tanggung jawabnya:**
+
+| Class | Tanggung jawab |
+|---|---|
+| `AuthService` | Registrasi, login, logout, ubah profil, ubah kata sandi, validasi kekuatan kata sandi. |
+| `SessionRegistry` | Menyimpan dan memvalidasi token sesi aktif (hanya di memori). |
+| `PasswordHasher` | Menghitung dan memverifikasi hash kata sandi PBKDF2. |
+| `ConnectionService` | Siklus hidup undangan, permintaan, persetujuan, dan pencabutan relasi. |
+| `LearningWorkspaceService` | CRUD data belajar yang sadar-peran, pembuatan grant, dan laporan progres. |
+| `LearningService` | Service lama untuk data arsip pra-akun (`students.json`, `teachers.json`, `profile.json`). |
+| `DemoDataService` | Membuat data contoh secara konservatif dan menandainya. |
+
+**Contoh class UI beserta tanggung jawabnya:**
+
+| Class | Tanggung jawab |
+|---|---|
+| `MainFrame` | Jendela tunggal; berpindah antara layar autentikasi dan ruang aplikasi. |
+| `AuthScreen` | Formulir masuk dan registrasi dengan pesan galat inline. |
+| `AppShell` | Rangka aplikasi: sidebar, bar atas, pemilih siswa, dan pemetaan halaman. |
+| `Workspace` | Menyimpan service, akun yang masuk, dan siswa terpilih; memberi tahu halaman saat cakupan berubah. |
+| `LearningTablePage<T>` | Dasar semua halaman CRUD belajar: tabel, pencarian, aksi tambah/edit/hapus. |
+| `DashboardPage`, `ProgressPage`, `ProfilePage`, `DirectoryPage`, dan seterusnya | Satu halaman per modul. |
+| `DataTable<T>` (di `ui.design`) | Komponen tabel generik dengan pencarian, filter, empty state, dan status pill. |
+| `FormDialog` (di `ui.design`) | Dialog formulir generik dengan validasi wajib dan pesan galat di dalam dialog. |
+| `AppLogo` (di `ui.design`) | Logo aplikasi: mark "H" glossy 3D dan wordmark "HomeLearn", digambar vektor. |
+
+---
+
+### 8.2 B. Object
+
+**Pengertian.**
+Object adalah **instans nyata** dari sebuah class — hasil konkret dari cetakan. Class `Subject` adalah cetakannya; `new Subject("Matematika", "Aljabar, geometri, dan pengolahan data")` adalah objeknya. Objek memiliki nilai atribut tersendiri, berada di memori, dan dapat diidentifikasi.
+
+**Contoh object dari class aktual di project ini:**
+
+```java
+// Dipanggil dari LearningWorkspaceFlowTest
+Subject subject = new Subject("Matematika", "Aljabar");
+
+LearningTask task = new LearningTask("Latihan Aljabar", subject.getId(), LocalDate.now().plusDays(2));
+
+Evaluation evaluation = new Evaluation(subject.getId(), LocalDate.now(), 85, 100, "Baik");
+```
+
+Ketiga baris di atas benar-benar ada di dalam `LearningWorkspaceFlowTest.teacherCreatesRecordsAndStudentSeesThem()`. Ketiganya adalah **object**: masing-masing punya nilai atribut sendiri, bisa diakses lewat getter, bisa disimpan ke repository, dan berinteraksi dengan object lain (misalnya `task.getSubjectId()` menunjuk object `subject` melalui identifier-nya).
+
+**Contoh object lain yang nyata di aplikasi:**
+
+| Object | Dibuat di |
+|---|---|
+| `new UserAccount(...)` | `AuthService.register()` |
+| `new TeacherInvitation(...)` | `ConnectionService.createInvitation()` |
+| `new TeacherConnectionRequest(...)` | `ConnectionService.requestConnection()` |
+| `new TeacherStudentConnection(...)` | `ConnectionService.approve()` |
+| `new LearningAccessGrant(...)` | `LearningWorkspaceService.save()` |
+| `new JsonRepository<>(...)` | `ApplicationRepositories.repo()` |
+| `new AuthService(...)`, `new ConnectionService(...)`, `new LearningWorkspaceService(...)` | `Main.main()` |
+| `new AppShell(...)`, `new DashboardPage(...)` | `AppShell.buildNavigation()` |
+
+**Contoh ilustratif (bukan kode aktual project).** Bayangkan satu object `Subject` dengan `id` "abc-123". Object `LearningTask` yang menyimpan `subjectId` = "abc-123" **berreferensi** ke object tersebut.
+
+---
+
+### 8.3 C. Attribute (State)
+
+**Pengertian.**
+Attribute adalah data yang dimiliki sebuah object — itulah "keadaan" (state) objek tersebut. Dalam Java, attribute ditulis sebagai field di dalam class, biasanya `private` supaya tidak bisa diubah langsung dari luar.
+
+**Contoh field aktual dari source code:**
+
+```java
+// model/Subject.java
+public final class Subject {
+    private String id = UUID.randomUUID().toString();
+    private String name;
+    private String description = "";
+}
+```
+
+```java
+// model/LearningTask.java (potongan)
+public class LearningTask extends LearningItem {
+    private String subjectId;
+    private LocalDate dueDate;
+    private boolean completed;
+    private String instructions = "";
+}
+```
+
+```java
+// model/UserAccount.java (potongan)
+public final class UserAccount {
+    private String id = UUID.randomUUID().toString();
+    private String name;
+    private String email;
+    private String passwordHash;
+    private AccountRole role;
+    private AccountStatus status = AccountStatus.ACTIVE;
+    private String educationLevel = "";
+}
+```
+
+**Catatan penting tentang `UserAccount`.** Terdapat field `passwordHash`, tetapi **tidak ada** field kata sandi polos, dan **tidak ada** getter untuk membacanya. Inilah bentuk paling dasar dari encapsulation: data sensitif disimpan ada, tetapi tidak diekspos.
+
+**Atribut di luar model pun ada.** `LearningWorkspaceService` menyimpan konstanta jenis resource:
+
+```java
+public static final String TYPE_SUBJECT = "subject";
+public static final String TYPE_MATERIAL = "material";
+public static final String TYPE_TASK = "task";
+public static final String TYPE_SESSION = "session";
+public static final String TYPE_EVALUATION = "evaluation";
+public static final String TYPE_GOAL = "goal";
+```
+
+Konstanta inilah yang mengikat record belajar dengan baris `LearningAccessGrant` miliknya.
+
+---
+
+### 8.4 D. Method (Perilaku)
+
+**Pengertian.**
+Method adalah fungsi yang melekat pada class — ia mendeskripsikan apa yang bisa dilakukan objek terhadap dirinya atau terhadap objek lain.
+
+**Contoh method aktual beserta kegunaannya:**
+
+| Method | Class | Kegunaan |
+|---|---|---|
+| `getPercentage()` | `Evaluation` | Menghitung persentase nilai dari `score / maximumScore * 100`. Dipakai tabel Evaluasi, dashboard, dan laporan progres. |
+| `isOverdue(LocalDate today)` | `LearningTask` | Menyatakan apakah tugas sudah melewati tenggat dan belum selesai. |
+| `getStatusLabel()` | `LearningTask`, `LearningGoal` | Menghasilkan teks status yang tampil di tabel ("Selesai", "Terlambat", "Belum selesai", "Tercapai", "Dalam proses"). |
+| `isExpiredAt(Instant now)` | `TeacherInvitation` | Menyatakan apakah kode undangan sudah melewati masa berlaku. |
+| `getRoleLabel()` | `Siswa`, `Pengajar` | Menghasilkan label peran untuk ditampilkan. |
+| `save(T entity)` | `JsonRepository` | Menulis atau memperbarui satu record ke berkas JSON. |
+| `findAll()` | `JsonRepository` | Membaca seluruh record dari berkas JSON. |
+| `deleteById(String id)` | `JsonRepository` | Menghapus satu record. |
+| `hash(char[] password)` | `PasswordHasher` | Menghitung hash PBKDF2 dari kata sandi. |
+| `matches(char[] password, String stored)` | `PasswordHasher` | Memverifikasi kata sandi terhadap hash tersimpan dengan perbandingan waktu-tetap. |
+| `requireAccount(String token)` | `SessionRegistry` | Mengambil akun aktif dari token; melempar `SecurityException` bila token tidak dikenal atau akun dinonaktifkan. |
+| `createInvitation(String token)` | `ConnectionService` | Membuat kode undangan acak dan menyimpan hash-nya. |
+| `approve(String token, String requestId)` | `ConnectionService` | Menyetujui permintaan, membuat relasi `ACTIVE`, dan menandai kode jadi `USED`. |
+| `progress(String token, String studentId)` | `LearningWorkspaceService` | Menghitung seluruh angka laporan progres dari record yang boleh dilihat. |
+| `recentActivity(String token, String studentId, int limit)` | `LearningWorkspaceService` | Menyusun feed aktivitas kronologis dari empat jenis record. |
+| `setScores(double score, double maximumScore)` | `Evaluation` | Mengubah nilai dan nilai maksimum sekaligus dengan validasi. |
+| `setTaskCompleted(String token, String taskId, boolean completed)` | `LearningWorkspaceService` | Mengubah flag selesai pada tugas milik siswa yang sedang masuk. |
+| `refresh()` | Seluruh halaman | Memuat ulang isi halaman. |
+| `paint(Graphics2D g, int x, int y, int size, Color color)` | `NavIcon` | Menggambar ikon vektor. |
+| `paintSurface(...)`, `paintCanvas(...)` | `Glass` | Menggambar permukaan kaca frosted dan latar bergradasi. |
+
+**Contoh method aktual yang paling sering ditunjukkan saat presentasi — `LearningWorkspaceService.list()`:**
+
+```java
+private <T> List<T> list(String token, String studentId, String type, Supplier<List<T>> all,
+        Function<T, String> id) {
+    UserAccount actor = sessions.requireAccount(token);
+    if (actor.getRole() == AccountRole.PENGAJAR) {
+        requireTeacherForStudent(token, studentId);
+    } else if (actor.getRole() != AccountRole.SISWA || !actor.getId().equals(studentId)) {
+        throw denied();
+    }
+    List<LearningAccessGrant> grants = grants();
+    return all.get().stream()
+            .filter(value -> grants.stream().anyMatch(g -> type.equals(g.getResourceType())
+                    && id.apply(value).equals(g.getResourceId())
+                    && studentId.equals(g.getStudentAccountId())
+                    && (actor.getRole() == AccountRole.SISWA || g.getTeacherAccountId().equals(actor.getId())))
+            .toList();
+}
+```
+
+Method ini adalah contoh method generik (`<T>`) yang menerima `Supplier<List<T>>` sebagai sumber data dan `Function<T, String>` sebagai pembaca ID. Satu method ini melayani keenam jenis data (materi, tugas, jadwal, target, evaluasi, mata pelajaran).
+
+---
+
+### 8.5 E. Constructor
+
+**Pengertian.**
+Constructor adalah method khusus yang dipanggil otomatis ketika sebuah object dibuat. Tugasnya adalah **menginisialisasi** atribut agar object berada dalam keadaan valid sejak detik pertama dibuat — bukan menerima object setengah jadi.
+
+**Mengapa constructor penting di project ini.** Sebagian besar aturan validasi berada di setter, dan setter dipanggil dari constructor. Akibatnya, object yang berhasil dibuat **pasti** sudah valid. Contoh: `new Evaluation("Matematika", LocalDate.now(), 85, 100, "Baik")` tidak mungkin gagal — kalau nilainya di luar rentang, constructor sudah melempar exception sebelum object selesai dibuat.
+
+**Constructor aktual yang dapat dijadikan contoh:**
+
+```java
+// model/Subject.java
+public Subject() { }
+public Subject(String name, String description) {
+    setName(name);
+    setDescription(description);
+}
+```
+
+```java
+// model/Pengguna.java
+protected Pengguna() { }
+protected Pengguna(String name, String email, String phone) {
+    setName(name); setEmail(email); setPhone(phone);
+}
+```
+
+```java
+// model/LearningItem.java
+protected LearningItem() {
+    this.id = UUID.randomUUID().toString();
+}
+protected LearningItem(String title) {
+    this();
+    setTitle(title);
+}
+```
+
+**Constructor default tanpa argumen** (`public Subject() { }`) ada pada hampir semua class model. Keperluannya teknis: Jackson memerlukan constructor tanpa argumen untuk membuat object saat membaca JSON. Field `id` sudah diberi nilai awal `UUID.randomUUID().toString()`, sehingga object hasil deserialisasi tetap punya ID.
+
+**Constructor berantai (constructor chaining).** `LearningItem(String title)` memanggil `this()` terlebih dahulu. Pola ini memastikan ID selalu terisi sebelum nilai lain diperiksa.
+
+**Constructor pada class lain:**
+
+| Class | Constructor |
+|---|---|
+| `UserAccount` | `UserAccount(String name, String email, String passwordHash, AccountRole role, String educationLevel)` |
+| `LearningMaterial` | 5 argumen dan 7 argumen (versi pendek dan versi lengkap) |
+| `LearningTask` | `LearningTask(String title, String subjectId, LocalDate dueDate)` dan versi dengan `instructions` |
+| `StudySession` | Versi tanpa siswa/pengajar dan versi lengkap dengan `studentId`, `teacherId` |
+| `Evaluation` | `Evaluation(String subjectId, LocalDate date, double score, double maximumScore, String notes)` |
+| `TeacherInvitation` | `TeacherInvitation(String teacherAccountId, String codeHash, Instant createdAt, Instant expiresAt)` |
+| `LearningAccessGrant` | `LearningAccessGrant(String type, String resourceId, String teacherId, String studentId)` |
+| `Service` | `AuthService(Repository<UserAccount>, SessionRegistry)`, `ConnectionService(...)`, `LearningWorkspaceService(ApplicationRepositories, SessionRegistry)` |
+
+**Catatan tentang `Evaluation`:** class ini memiliki constructor beranotasi Jackson yang menerima enam properti dan meneruskannya ke setter tervalidasi:
+
+```java
+@JsonCreator
+public Evaluation(@JsonProperty("id") String id,
+                  @JsonProperty("subjectId") String subjectId,
+                  @JsonProperty("date") LocalDate date,
+                  @JsonProperty("score") double score,
+                  @JsonProperty("maximumScore") double maximumScore,
+                  @JsonProperty("notes") String notes) {
+    if (id != null) setId(id);
+    setSubjectId(subjectId);
+    setDate(date);
+    setScores(score, maximumScore);
+    setNotes(notes);
+}
+```
+
+Dengan begitu, data dari berkas JSON pun melewati validasi yang sama dengan data dari UI.
+
+---
+
+### 8.6 F. Encapsulation
+
+**Pengertian.**
+Encapsulation berarti **menyembunyikan detail internal** sebuah object dan hanya membuka apa yang benar-benar diperlukan. Dalam Java hal ini dilakukan dengan:
+1. *access modifier* `private` untuk atribut;
+2. method getter/setter sebagai pintu masuk;
+3. validasi di dalam setter sehingga object tidak pernah berada dalam keadaan tidak valid.
+
+**Mengapa ini penting di project ini.** Aplikasi ini menyimpan data pribadi siswa dan nilai. Bila `Evaluation.score` bisa diisi bebas, angka 150 pada nilai maksimum 100 bisa masuk dan merusak seluruh rata-rata laporan. Encapsulation mencegah itu.
+
+**Bukti nyata #1 — validasi nilai (`model/Evaluation.java`):**
+
+```java
+public void setScores(double score, double maximumScore) {
+    if (!Double.isFinite(maximumScore) || maximumScore <= 0 || !Double.isFinite(score)
+            || score < 0 || score > maximumScore)
+        throw new IllegalArgumentException(
+                "Nilai harus di antara 0 dan nilai maksimum yang lebih besar dari 0.");
+    this.score = score;
+    this.maximumScore = maximumScore;
+}
+```
+
+Perhatikan bahwa setter ini juga menggunakan `setScores()` — bukan setter terpisah — untuk nilai dan nilai maksimum. Ini mencegah kondisi setengah jadi: misalnya nilai maksimum dinaikkan tetapi nilai lama sudah melebihi batas baru.
+
+**Bukti nyata #2 — hash kata sandi (`model/UserAccount.java`):**
+
+```java
+public void setPasswordHash(String passwordHash) {
+    String value = required(passwordHash, "Hash kata sandi");
+    if (!value.matches("pbkdf2-sha256\\$[0-9]{6}\\$[A-Za-z0-9_-]{22}\\$[A-Za-z0-9_-]{43}"))
+        throw new IllegalArgumentException("Format hash kata sandi tidak valid.");
+    this.passwordHash = value;
+}
+```
+
+Format hash divalidasi oleh regex. Selain itu `UserAccount` **tidak punya** `getPassword()` dan **tidak punya** field plaintext.
+
+**Bukti nyata #3 — validasi email (`model/Pengguna.java`):**
+
+```java
+public void setEmail(String email) {
+    String value = email == null ? "" : email.trim();
+    if (!value.isEmpty() && !value.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))
+        throw new IllegalArgumentException("Format email tidak valid.");
+    this.email = value;
+}
+```
+
+**Bukti nyata #4 — validasi lain yang tersebar di model:**
+
+| Class | Validasi |
+|---|---|
+| `Siswa.setBirthDate()` | Tanggal lahir wajib diisi dan tidak boleh di masa depan. |
+| `LearningTask.setDueDate()` | Tenggat wajib diisi. |
+| `StudySession.setDurationMinutes()` | Durasi antara 1 dan 1440 menit. |
+| `Subject.setName()` | Nama wajib diisi. |
+| `TeacherInvitation.setCodeHash()` | Harus 64 karakter heksadesimal. |
+| `LearningAccessGrant` (semua setter) | Kelengkapan relasi kepemilikan wajib terisi. |
+| `UserAccount.setRole()`, `setStatus()` | Peran dan status tidak boleh `null`. |
+
+**Bukti nyata #5 — encapsulation di lapisan service.** Aturan akses juga di-*enclose* di dalam service, bukan ditabur di UI. Contoh: `LearningWorkspaceService.denied()` mengembalikan `SecurityException` generik sehingga pesan internal tidak bocor:
+
+```java
+private static SecurityException denied() {
+    return new SecurityException("Anda tidak memiliki akses untuk data ini.");
+}
+```
+
+---
+
+### 8.7 G. Inheritance
+
+**Pengertian.**
+Inheritance (pewarisan) adalah mekanisme ketika sebuah class **mewarisi** atribut dan method dari class lain (superclass / parent class). Subclass mendapat semua kemampuan induknya dan dapat menambah atau mengubah perilakunya.
+
+**Hubungan inheritance yang benar-benar ada di project ini:**
+
+```mermaid
+classDiagram
+    class Pengguna {
+        <<abstract>>
+        -String id
+        -String name
+        -String email
+        -String phone
+        +getRoleLabel() String
+    }
+    class Siswa {
+        -LocalDate birthDate
+        -String educationLevel
+        -String learningPreferences
+    }
+    class Pengajar {
+        -String expertise
+        -String qualifications
+    }
+    class StudentProfile {
+        <<deprecated>>
+    }
+    Pengguna <|-- Siswa
+    Pengguna <|-- Pengajar
+    Siswa <|-- StudentProfile
+
+    class LearningItem {
+        <<abstract>>
+        -String id
+        -String title
+        +getStatusLabel() String
+    }
+    class LearningTask {
+        -String subjectId
+        -LocalDate dueDate
+        -boolean completed
+        -String instructions
+    }
+    class LearningGoal {
+        -LocalDate targetDate
+        -boolean achieved
+    }
+    LearningItem <|-- LearningTask
+    LearningItem <|-- LearningGoal
+```
+
+**Superclass `Pengguna` (abstract):**
+
+```java
+public abstract class Pengguna {
+    private String id = UUID.randomUUID().toString();
+    private String name;
+    private String email = "";
+    private String phone = "";
+
+    protected Pengguna() { }
+    protected Pengguna(String name, String email, String phone) {
+        setName(name); setEmail(email); setPhone(phone);
+    }
+    ...
+    @JsonIgnore
+    public abstract String getRoleLabel();
+}
+```
+
+**Subclass `Siswa`:**
+
+```java
+public class Siswa extends Pengguna {
+    private LocalDate birthDate;
+    private String educationLevel = "";
+    private String learningPreferences = "";
+
+    public Siswa() { super(); }
+    public Siswa(String name, String email, String phone, LocalDate birthDate,
+                 String educationLevel, String learningPreferences) {
+        super(name, email, phone);
+        setBirthDate(birthDate);
+        setEducationLevel(educationLevel);
+        setLearningPreferences(learningPreferences);
+    }
+    ...
+    @JsonIgnore
+    @Override public String getRoleLabel() { return "Siswa"; }
+}
+```
+
+**Apa yang didapat dari pewarisan:**
+`Siswa` otomatis punya `id`, `name`, `email`, `phone` beserta getter/setter-nya. `Siswa` **tidak perlu** menulis ulang validasi email, validasi nama wajib, atau pembuatan UUID. Yang membedakan adalah data khusus siswa: `birthDate`, `educationLevel`, `learningPreferences`.
+
+**Superclass `LearningItem` (abstract):**
+
+```java
+public abstract class LearningItem {
+    private String id;
+    private String title;
+
+    protected LearningItem() { this.id = UUID.randomUUID().toString(); }
+    protected LearningItem(String title) { this(); setTitle(title); }
+
+    public String getId() { return id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = requireText(title, "Judul"); }
+
+    @JsonIgnore
+    public abstract String getStatusLabel();
+}
+```
+
+`LearningTask` dan `LearningGoal` sama-sama mewarisi `id` dan `title`, sehingga tabel dapat menampilkan kolom "Judul" untuk keduanya, dan `requireText()` cukup ditulis sekali.
+
+**Pewarisan tiga tingkat (`StudentProfile`):**
+
+```java
+@Deprecated(forRemoval = false)
+public final class StudentProfile extends Siswa {
+    public StudentProfile() {
+        super();
+        setId("student-profile");
+    }
+}
+```
+
+`StudentProfile` adalah model lama yang dipertahankan agar berkas `profile.json` versi lama masih bisa dibaca. Perhatikan bahwa `id` di-override di constructor menjadi konstan `"student-profile"` agar cocok dengan data lama.
+
+**Diuji oleh:** `PeopleModelTest.studentAndTeacherShareUserContractWithDifferentRoles()` — membuktikannya bahwa `Siswa` dan `Pengajar` benar-benar berbagi kontrak yang sama (`id`, `name`, `email`) tetapi memiliki label peran berbeda.
+
+**Catatan jujur.** Warisan dalam project ini sengaja dibuat **dangkal**: hanya dua hierarchy, masing-masing dengan satu abstract base. Belum ada hierarchy bertingkat tiga di luar `StudentProfile`, dan belum ada interface bersama di antara model. Ini keputusan sadar — terlalu banyak warisan membuat model sulit dipahami, dan yang paling penting di mata kuliah ini adalah menunjukkan bahwa warisan dipakai dengan benar, bukan sebanyak-banyaknya.
+
+---
+
+### 8.8 H. Polymorphism
+
+**Pengertian.**
+Polymorphism (banyak bentuk) adalah kemampuan satu pemanggilan untuk menghasilkan perilaku berbeda tergantung pada object yang sebenarnya. Dalam Java ada empat bentuknya: *overloading*, *overriding*, *polymorphism berbasis interface*, dan *polymorphism berbasis superclass*.
+
+#### H.1 Method Overriding — benar-benar dipakai
+
+**Superclass mendefinisikan kontrak:**
+```java
+// model/Pengguna.java
+@JsonIgnore
+public abstract String getRoleLabel();
+```
+
+**Subclass meng-override:**
+```java
+// model/Siswa.java
+@Override public String getRoleLabel() { return "Siswa"; }
+
+// model/Pengajar.java
+@Override public String getRoleLabel() { return "Pengajar"; }
+```
+
+Caller menulis `pengguna.getRoleLabel()` dan memperoleh "Siswa" atau "Pengajar" tergantung object-nya. `Pengguna` tidak bisa diinstansiasi karena ia `abstract` - pemanggil **wajib** berhadapan dengan bentuk konkret.
+
+**Polymorphism yang sama pada `LearningItem`:**
+
+```java
+// model/LearningItem.java
+@JsonIgnore
+public abstract String getStatusLabel();
+
+// model/LearningTask.java
+@Override public String getStatusLabel() {
+    if (completed) return "Selesai";
+    return isOverdue(LocalDate.now()) ? "Terlambat" : "Belum selesai";
+}
+
+// model/LearningGoal.java
+@Override public String getStatusLabel() { return achieved ? "Tercapai" : "Dalam proses"; }
+```
+
+Kode UI cukup menulis `item.getStatusLabel()` tanpa perlu tahu apakah item itu tugas atau target. Ini yang memungkinkan `LearningTablePage<T>` melayani kedua tipe dengan satu implementasi.
+
+**Diuji oleh:** `ModelValidationTest.polymorphicStatusReflectsTaskAndGoalState()`.
+
+#### H.2 Polymorphism berbasis Interface — benar-benar dipakai
+
+**Interface `Repository<T>`:**
+
+```java
+public interface Repository<T> {
+    List<T> findAll();
+    Optional<T> findById(String id);
+    T save(T entity);
+    boolean deleteById(String id);
+}
+```
+
+**Implementasi `JsonRepository<T>`:**
+
+```java
+public final class JsonRepository<T> implements Repository<T> {
+    ...
+}
+```
+
+Service hanya mengenal interface:
+
+```java
+public AuthService(Repository<UserAccount> accounts, SessionRegistry sessions) {
+    this.accounts = Objects.requireNonNull(accounts);
+    this.sessions = Objects.requireNonNull(sessions);
+}
+```
+
+`'accounts` bertipe `Repository<UserAccount>`, bukan `JsonRepository<UserAccount>`. Bila suatu saat dibutuhkan implementasi JDBC, `AuthService` **tidak perlu diubah sama sekali** — cukup ganti objek yang dikirimkan ke constructor. Inilah manfaat nyata dari abstraksi.
+
+**Interface `AppShell.Refreshable`:**
+
+```java
+public interface Refreshable {
+    void refresh();
+}
+```
+
+Semua halaman mengimplementasikannya, dan shell memuat ulang halaman secara polimorfis:
+
+```java
+private void register(String id, JPanel page) {
+    pages.put(id, page);
+    refreshers.put(id, () -> {
+        if (page instanceof Refreshable refreshable) refreshable.refresh();
+    });
+    content.add(page, id);
+}
+```
+
+`AppShell` tidak tahu tipe konkret halaman yang dimuat. Ia hanya tahu: "kalau halaman ini bisa refresh, panggil saja". Inilah *polymorphism* yang membuat penambahan halaman baru cukup satu baris di `buildNavigation()` tanpa mengubah `AppShell`.
+
+#### H.3 Polymorphism berbasis Enum dengan `switch` eksklusif
+
+Status pada model dinyatakan sebagai enum, dan UI memetakannya memakai `switch` yang mencakup semua kemungkinan:
+
+```java
+// ui/TeacherRequestsPage.java
+static String statusLabel(ConnectionRequestSummary request) {
+    return switch (request.status()) {
+        case PENDING -> "Menunggu";
+        case APPROVED -> "Disetujui";
+        case REJECTED -> "Ditolak";
+    };
+}
+```
+
+```java
+// ui/InvitationsPage.java
+static String statusLabel(InvitationStatus status) {
+    return switch (status) {
+        case ACTIVE -> "Aktif";
+        case USED -> "Sudah dipakai";
+        case REVOKED -> "Dicabut";
+        case EXPIRED -> "Kedaluwarsa";
+    };
+}
+```
+
+Karena `switch` atas enum bersifat eksklusif, **kompilator akan menolak build** bila ada nilai enum baru yang belum ditangani. Ini adalah bentuk pertama yang aman dari kesalahan.
+
+#### H.4 Record dan Polimorfisme Data
+
+Beberapa class data ditulis sebagai `record` — immutable data carrier yang otomatis menyediakan constructor, getter, `equals()`, `hashCode()`, dan `toString()`:
+
+```java
+public record UserSession(String token, String accountId, String name, String email, AccountRole role,
+                          String educationLevel) {
+    @Override public String toString() {
+        return "UserSession[accountId=" + accountId + ", name=" + name
+                + ", role=" + role + ", token=REDACTED]";
+    }
+}
+```
+
+Perhatikan `toString()` di atas: token sesi sengaja ditulis sebagai `REDACTED` supaya tidak bocor bila object ini dicetak ke log. Ini contoh kecil-kecilan prinsip "information hiding" yang nyata.
+
+Record lain: `AccountSummary`, `ProgressReport` (+ `ProgressReport.SubjectProgress`), `PersonSummary`, `ActivityEntry`, `InvitationSummary`, `ConnectionRequestSummary`, `CreatedInvitation`, `ProgressSummary`, `DashboardSummary`.
+
+---
+
+### 8.9 I. Abstraction
+
+**Pengertian.**
+Abstraction berarti menyembunyikan detail implementasi dan hanya expose apa yang dibutuhkan. Dalam Java, bentuk paling umum adalah **abstract class** (class yang tidak dapat diinstansiasi dan boleh punya method abstrak) dan **interface** (kontrak murni).
+
+#### I.1 Abstract Class
+
+| Abstract class | Yang diabstraksi | Kenapa abstract |
+|---|---|---|
+| `Pengguna` | Identitas dan kontak orang | Tidak ada orang "tanpa peran"; harus ada `Siswa` atau `Pengajar`. `getRoleLabel()` wajib diimplementasikan. |
+| `LearningItem` | Identitas dan judul item belajar | Tidak ada "item" tanpa jenis; harus `LearningTask` atau `LearningGoal`. `getStatusLabel()` wajib diimplementasikan. |
+
+Keduanya juga **memiliki** implementasi konkret (bukan murni abstrak): `Pengguna` menyimpan `id`, `name`, `email`, `phone` beserta validasi; `LearningItem` menyimpan `id`, `title` dan `requireText()`.
+
+#### I.2 Interface
+
+| Interface | Kontrak | Implementasi |
+|---|---|---|
+| `Repository<T>` | Empat operasi baca/tulis data | `JsonRepository<T>` |
+| `AppShell.Refreshable` | Satu method `refresh()` | Semua halaman di package `ui` |
+
+#### I.3 Abstraksi melalui Generics
+
+`DataTable<T>` adalah abstraksi yang elegan: tabel ini **tidak tahu** asal datanya.
+
+```java
+public final class DataTable<T> extends JPanel {
+    public DataTable(String[] columns, Supplier<List<T>> loader, Function<T, Object[]> mapper) { ... }
+}
+```
+
+Penerjemahannya: `loader` adalah cara memuat data (dari repository, dari daftar statis, dari apa pun), `mapper` adalah cara mengubah satu record menjadi baris tabel. Karena itu tabel yang sama bisa dipakai untuk `Subject`, `LearningMaterial`, `LearningTask`, `StudySession`, `Evaluation`, `LearningGoal`, `PersonSummary`, `InvitationSummary`, dan `ConnectionRequestSummary` — sembilan tipe berbeda dengan satu komponen.
+
+`LearningTablePage<T>` menerapkan pola yang sama:
+
+```java
+protected LearningTablePage(Workspace workspace, String title, String description, String[] columns,
+        Function<Workspace, List<T>> loader, BiFunction<Workspace, T, Object[]> mapper,
+        String emptyTitle, String emptyDescription) { ... }
+```
+
+Enam halaman belajar (Subject, Schedule, Material, Task, Goal, Evaluation) hanya perlu meng-*override* lima method abstrak:
+
+```java
+protected abstract String entityName();
+protected abstract String resourceType();
+protected abstract List<FormDialog.Field> formFields(T template);
+protected abstract void persist(T existing, Map<String, Object> values);
+```
+
+Hasilnya: seluruh perilaku umum (tabel, pencarian, tombol tambah/edit/hapus, validasi cakupan siswa, dialog konfirmasi hapus) ditulis **sekali** dan berlaku untuk semua modul. Inilah manfaat nyata dari abstraksi: **perubahan cukup dilakukan di satu tempat**.
+
+#### I.4 Abstraksi pada Layer Service
+
+`LearningWorkspaceService` menerima `ApplicationRepositories` yang mengekspos data sebagai `Repository<T>`. Service tidak tahu apa pun tentang Jackson, berkas JSON, atau `ObjectMapper`. Layer repository-lah yang tahu.
+
+---
+
+### 8.10 J. Hubungan Antarkomponen
+
+**Pola arsitektur yang dipakai: layered architecture (arsitektur berlapis).**
+
+```mermaid
+flowchart TD
+    UI["UI (Swing)<br/>AppShell, halaman, DataTable, FormDialog"]
+    SVC["Service<br/>AuthService, ConnectionService,<br/>LearningWorkspaceService"]
+    REPO["Repository<br/>Repository&lt;T&gt; (interface)<br/>JsonRepository&lt;T&gt; (implementasi)"]
+    MODEL["Model<br/>22 class data"]
+    FILE[("Berkas JSON<br/>~/.homeschooling-learning-system/data")]
+
+    UI -->|"memanggil method service"| SVC
+    SVC -->|"memakai kontrak Repository"| REPO
+    REPO -->|"membaca / menulis objek"| MODEL
+    MODEL -.->|"memuat atribut dan aturan validasi data"| MODEL
+    REPO -->|"serialisasi JSON"| FILE
+    MODEL -->|"divalidasi oleh setter-nya sendiri"| MODEL
+
+    style UI fill:#EBEAFD
+    style SVC fill:#E7EEFF
+    style REPO fill:#E4F4ED
+    style MODEL fill:#FDF3E0
+    style FILE fill:#F3F4F6
+```
+
+#### Tanggung jawab tiap lapisan
+
+| Lapisan | Tanggung jawab | TIDAK BOLEH | Contoh class |
+|---|---|---|---|
+| **Model** | Menyrepresentasikan data dan menjaga data itu tetap valid | Tahu apa-apa tentang Swing, berkas, atau HTTP | `Subject`, `LearningTask`, `Evaluation`, `UserAccount` |
+| **Service** | Aturan bisnis: siapa boleh apa, dan bagaimana data diproses | Merender komponen Swing | `AuthService`, `ConnectionService`, `LearningWorkspaceService` |
+| **Repository** | Akses dan penyimpanan data | Mengetahui peran pengguna atau aturan bisnis | `Repository<T>`, `JsonRepository<T>`, `ApplicationRepositories` |
+| **UI** | Menampilkan informasi dan menerjemahkan aksi pengguna menjadi panggilan service | Mengambil keputusan bisnis sendiri | `AppShell`, `LearningTablePage`, `DataTable`, `FormDialog` |
+
+#### Alur pemanggilan yang nyata
+
+**Contoh 1 — Siswa menandai tugas selesai:**
+
+```text
+Siswa menekan tombol "Tandai selesai" di TaskPage
+  -> TaskPage.toggleCompletion()
+  -> LearningWorkspaceService.setTaskCompleted(token, taskId, true)
+       -> sessions.requireAccount(token)          [ambil akun aktif]
+       -> repos.tasks().findById(taskId)           [cari tugas]
+       -> grants()                                 [cari grant kepemilikan]
+       -> cek grant.getStudentAccountId() == akun  [kebenaran]
+       -> task.setCompleted(true)
+       -> repos.tasks().save(task)                 [tulis ke tasks.json]
+  -> TaskPage.refresh()                            [tabel dimuat ulang]
+```
+
+**Contoh 2 — Dashboard menampilkan rata-rata nilai:**
+
+```text
+DashboardPage.refresh()
+  -> LearningWorkspaceService.progress(token, studentId)
+       -> subjects(token, studentId)   -> list(...)  [filter berdasar grant]
+       -> tasks(token, studentId)      -> list(...)
+       -> goals(token, studentId)      -> list(...)
+       -> evaluations(token, studentId)-> list(...)
+       -> materials(token, studentId)  -> list(...)
+       -> sessions(token, studentId)   -> list(...)
+       -> hitung jumlah, rata-rata, per mata pelajaran
+       -> new ProgressReport(...)
+  -> DashboardPage menampilkan kartu StatCard dari objek tersebut
+```
+
+**Contoh 3 — Form tambah materi:**
+
+```text
+MaterialPage (tombol Tambah)
+  -> LearningTablePage.openDialog(...)
+       -> FormDialog.show(...)  -> validate kolom wajib
+       -> MaterialPage.persist(null, values)
+            -> LearningWorkspaceService.saveMaterial(token, studentId, record)
+                 -> requireSubject(token, studentId, record.getSubjectId())
+                 -> save(token, studentId, TYPE_MATERIAL, id, ...)
+                      -> requireTeacherForStudent(token, studentId)
+                      -> repos.materials().save(record)
+                      -> repos.learningAccessGrants().save(new LearningAccessGrant(...))
+            -> FormDialog callback -> Dialogs.success(...) -> refresh()
+```
+
+#### titik yang perlu diperhatikan saat presentasi
+
+1. **UI tidak pernah memanggil `Repository` secara langsung.** Semua lewat service. Ini yang membuat aturan akses tidak bisa dilewati.
+2. **Model tidak tahu apa-apa tentang lapisan lain.** `Evaluation` tidak tahu ia akan disimpan sebagai JSON; ia hanya tahu aturan nilainya valid.
+3. **Service boleh bergantung pada repository melalui interface saja.** Ini yang membuat penggantian media penyimpanan di masa depan tidak menyentuh logika bisnis.
+4. **`Main` adalah composition root** — satu-satunya tempat yang tahu semua class dan menyusunnya:
+
+```java
+ApplicationRepositories repositories = ApplicationRepositories.inDefaultLocation();
+SessionRegistry sessions = new SessionRegistry(repositories.accounts());
+AuthService authentication = new AuthService(repositories.accounts(), sessions);
+ConnectionService connections = new ConnectionService(repositories.accounts(), repositories.invitations(),
+        repositories.connectionRequests(), repositories.connections(), sessions);
+LearningWorkspaceService learning = new LearningWorkspaceService(repositories, sessions);
+DemoDataService demo = new DemoDataService(repositories, authentication, connections, learning);
+demo.seedIfNeeded();
+new MainFrame(authentication, connections, learning, new LearningService(repositories), demo).setVisible(true);
+```
+
+Seluruh dependensi disuntikkan lewat constructor. Tidak ada `new` di dalam method bisnis selain pembuatan object domain itu sendiri. Constructor injection inilah yang membuat class-class service dapat diuji tanpa Swing sama sekali — itulah cara 67 test dapat berjalan cepat dan deterministik.
+
+---
+## BAB 9 — Data, Relasi, dan Penyimpanan
+
+### 9.1 Jenis Data yang Dikelola
+
+Aplikasi mengelola **15 jenis data** yang masing-masing disimpan pada berkas JSON tersendiri.
+
+| # | Data | Class model | Berkas JSON | Penggolongan |
+|---|---|---|---|---|
+| 1 | Akun pengguna | `UserAccount` | `accounts.json` | Identitas |
+| 2 | Undangan | `TeacherInvitation` | `teacher-invitations.json` | Koneksi |
+| 3 | Permintaan koneksi | `TeacherConnectionRequest` | `teacher-connection-requests.json` | Koneksi |
+| 4 | Relasi pengajar–siswa | `TeacherStudentConnection` | `teacher-student-connections.json` | Koneksi |
+| 5 | Grant kepemilikan | `LearningAccessGrant` | `learning-access-grants.json` | Akses |
+| 6 | Mata pelajaran | `Subject` | `subjects.json` | Belajar |
+| 7 | Materi | `LearningMaterial` | `materials.json` | Belajar |
+| 8 | Jadwal belajar | `StudySession` | `study-sessions.json` | Belajar |
+| 9 | Tugas | `LearningTask` | `tasks.json` | Belajar |
+| 10 | Target belajar | `LearningGoal` | `goals.json` | Belajar |
+| 11 | Evaluasi | `Evaluation` | `evaluations.json` | Belajar |
+| 12 | Penanda data demo | `DemoMarkers` | `demo-data.json` | Bookkeeping |
+| 13 | Profil lama *(arsip)* | `StudentProfile` | `profile.json` | Arsip (baca saja) |
+| 14 | Siswa lama *(arsip)* | `Siswa` | `students.json` | Arsip (baca saja) |
+| 15 | Pengajar lama *(arsip)* | `Pengajar` | `teachers.json` | Arsip (baca saja) |
+
+Catatan: tiga baris terakhir adalah data arsip dari versi project sebelum sistem akun ada. Semuanya dibaca dan ditampilkan sebagai baca-saja pada halaman Data siswa dan Data pengajar (lihat subbab 5.17), dan **tidak** dimuat ke halaman modul belajar karena tidak memiliki *ownership grant*.
+
+Pabrik repository yang mengatur semuanya ada di `ApplicationRepositories`:
+
+```java
+public ApplicationRepositories(Path dataDirectory) {
+    this.dataDirectory = dataDirectory.toAbsolutePath().normalize();
+    profile  = repo("profile.json", StudentProfile.class, StudentProfile::getId);
+    students = repo("students.json", Siswa.class, Siswa::getId);
+    teachers = repo("teachers.json", Pengajar.class, Pengajar::getId);
+    subjects = repo("subjects.json", Subject.class, Subject::getId);
+    materials = repo("materials.json", LearningMaterial.class, LearningMaterial::getId);
+    sessions = repo("study-sessions.json", StudySession.class, StudySession::getId);
+    tasks = repo("tasks.json", LearningTask.class, LearningTask::getId);
+    goals = repo("goals.json", LearningGoal.class, LearningGoal::getId);
+    evaluations = repo("evaluations.json", Evaluation.class, Evaluation::getId);
+    accounts = repo("accounts.json", UserAccount.class, UserAccount::getId);
+    invitations = repo("teacher-invitations.json", TeacherInvitation.class, TeacherInvitation::getId);
+    connectionRequests = repo("teacher-connection-requests.json", TeacherConnectionRequest.class, TeacherConnectionRequest::getId);
+    connections = repo("teacher-student-connections.json", TeacherStudentConnection.class, TeacherStudentConnection::getId);
+    learningAccessGrants = repo("learning-access-grants.json", LearningAccessGrant.class, LearningAccessGrant::getId);
+}
+```
+
+Perhatikan pola `repo(nama, tipe, pembacaId)`. Satu resep untuk membuat repository, dan tiap repository hanya berbeda pada nama berkas, tipe data, dan cara membaca ID-nya.
+
+### 9.2 Hubungan Antar Data
+
+```mermaid
+erDiagram
+    UserAccount ||--o{ TeacherInvitation : "membuat (teacherAccountId)"
+    UserAccount ||--o{ TeacherConnectionRequest : "mengirim (studentAccountId)"
+    TeacherInvitation ||--o{ TeacherConnectionRequest : "dirujuk oleh (invitationId)"
+    UserAccount ||--o{ TeacherStudentConnection : "relasi pengajar-siswa"
+    UserAccount ||--o{ LearningAccessGrant : "pemilik (teacherAccountId / studentAccountId)"
+    Subject ||--o{ LearningMaterial : "materi (subjectId)"
+    Subject ||--o{ StudySession : "jadwal (subjectId)"
+    Subject ||--o{ LearningTask : "tugas (subjectId)"
+    Subject ||--o{ Evaluation : "evaluasi (subjectId)"
+    UserAccount ||--o{ StudySession : "siswa & pengajar (studentId / teacherId)"
+    LearningAccessGrant }o--|| Subject : "subject"
+    LearningAccessGrant }o--|| LearningMaterial : "material"
+    LearningAccessGrant }o--|| LearningTask : "task"
+    LearningAccessGrant }o--|| StudySession : "session"
+    LearningAccessGrant }o--|| Evaluation : "evaluation"
+    LearningAccessGrant }o--|| LearningGoal : "goal"
+```
+
+**Cara relasi direpresentasikan.** Relasi antar tabel **tidak** memakai kunci asing. Setiap sisi menyimpan ID dari sisi lain sebagai field `String`:
+
+| Relasi | Field penghubung |
+|---|---|
+| Akun ↔ Undangan | `TeacherInvitation.teacherAccountId` |
+| Permintaan ↔ Akun | `TeacherConnectionRequest.studentAccountId`, `.teacherAccountId` |
+| Permintaan ↔ Undangan | `TeacherConnectionRequest.invitationId` |
+| Relasi ↔ Akun | `TeacherStudentConnection.studentAccountId`, `.teacherAccountId` |
+| Grant ↔ Akun | `LearningAccessGrant.teacherAccountId`, `.studentAccountId` |
+| Grant ↔ Record | `LearningAccessGrant.resourceType` + `.resourceId` |
+| Record ↔ Mata Pelajaran | `subjectId` pada `LearningMaterial`, `StudySession`, `LearningTask`, `Evaluation` |
+| Jadwal ↔ Orang | `StudySession.studentId`, `.teacherId` |
+
+**Contoh nyata.** Object `LearningTask` yang disimpan di `tasks.json` berbentuk kira-kira begini:
+
+```json
+{
+  "id": "3b7c...",
+  "title": "Latihan Persamaan Linear",
+  "subjectId": "9f21...",
+  "dueDate": "2026-10-23",
+  "completed": false,
+  "instructions": "Kerjakan lima soal persamaan linear pada halaman 12. ..."
+}
+```
+
+Dan `subjectId` di atas menunjuk ke object `Subject` yang ada di `subjects.json`.
+
+### 9.3 Grant Kepemilikan — Penjaga Akses Data
+
+`LearningAccessGrant` adalah mekanisme paling penting dalam model data ini. Setiap record belajar yang dibuat melalui aplikasi **wajib** memiliki satu baris grant.
+
+| Field | Arti |
+|---|---|
+| `resourceType` | `"subject"`, `"material"`, `"task"`, `"session"`, `"evaluation"`, atau `"goal"` |
+| `resourceId` | ID record yang dimiliki |
+| `teacherAccountId` | Pengajar yang membuat record |
+| `studentAccountId` | Siswa yang menjadi pemilik record |
+
+Grant inilah yang membuat **data antar-siswa tidak saling tumpah**. Setiap kali data dibaca, `LearningWorkspaceService.list()` menyaring record berdasarkan grant. Grant dibuat otomatis setiap kali record baru disimpan, dan ikut terhapus ketika record dihapus:
+
+```java
+boolean removed = switch (type) {
+    case TYPE_SUBJECT -> repos.subjects().deleteById(id);
+    case TYPE_MATERIAL -> repos.materials().deleteById(id);
+    ...
+};
+if (removed) repos.learningAccessGrants().deleteById(grant.getId());
+return removed;
+```
+
+### 9.4 Cara Data Disimpan dan Dibaca
+
+Seluruh operasi baca/tulis melewati `JsonRepository<T>`.
+
+**Pembacaan:**
+
+```java
+@Override public synchronized List<T> findAll() {
+    if (Files.notExists(file)) return new ArrayList<>();
+    try {
+        List<T> data = MAPPER.readValue(file.toFile(), listType);
+        return data == null ? new ArrayList<>() : new ArrayList<>(data);
+    } catch (IOException | RuntimeException exception) {
+        throw new RepositoryException("Data tidak dapat dibaca dari " + file + ". File tidak diubah.", exception);
+    }
+}
+```
+
+Berkas yang belum ada menghasilkan daftar kosong, bukan error. Berkas yang rusak **tidak dihapus atau ditimpa** — errornya dilaporkan, dan isi berkasnya tetap utuh untuk diperiksa manual.
+
+**Penulisan secara atomik:**
+
+```java
+private void write(List<T> data) {
+    Path temporary = file.resolveSibling(file.getFileName() + ".tmp");
+    try {
+        Files.createDirectories(file.getParent());
+        MAPPER.writerFor(listType).writeValue(temporary.toFile(), data);
+        try {
+            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException exception) {
+            Files.move(temporary, file, StandardCopyOption.REPLACE_EXISTING);
+        }
+    } catch (IOException exception) {
+        try { Files.deleteIfExists(temporary); } catch (IOException ignored) { }
+        throw new RepositoryException("Data tidak dapat disimpan ke " + file + ".", exception);
+    }
+}
+```
+
+**Mengapa ini penting.** Data ditulis lebih dulu ke berkas `.tmp`, lalu dipindahkan ke nama akhir dengan operasi *atomic move* (rename pada sistem berkas). Bila aplikasi mati di tengah penulisan, berkas lama tetap utuh — bukan setengah jadi. Bila sistem berkas tidak mendukung atomic move, code jatuh ke `REPLACE_EXISTING` (mulai lambat tapi tetap aman terhadap berkas setengah tertulis).
+
+**Serialisasi.** Jackson dengan modul JSR-310 membuat `LocalDate` menjadi teks `"2026-10-20"` dan `Instant` menjadi teks ISO-8601, bukan angka. Konfigurasi `ObjectMapper`:
+
+```java
+private static final ObjectMapper MAPPER = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .enable(SerializationFeature.INDENT_OUTPUT);
+```
+
+`INDENT_OUTPUT` membuat berkas JSON berformat rapi dan enak dibaca saat didemokan.
+
+**Diuji oleh:** `JsonRepositoryTest.savesUpdatesDeletesAndReloadsJson()` dan `JsonRepositoryTest.preservesMalformedFileAndReportsReadFailure()`.
+
+### 9.5 Apakah Data Bertahan Setelah Aplikasi Ditutup?
+
+**Ya.** Berkas JSON ditulis ke disk secara langsung, bukan hanya di memori.
+
+- **Lokasi default:** `<user.home>/.homeschooling-learning-system/data/`
+- **Dibuat oleh:** `ApplicationRepositories.inDefaultLocation()`
+
+```java
+public static ApplicationRepositories inDefaultLocation() {
+    return new ApplicationRepositories(
+            Path.of(System.getProperty("user.home"), ".homeschooling-learning-system", "data"));
+}
+```
+
+**Bukti bahwa data bertahan:**
+- `AuthFlowTest.registerLoginLogoutWorksAndAccountSurvivesRestart()` — membuat `TestEnvironment` baru pada direktori yang sama, lalu akun lama masih bisa dipakai untuk login.
+- `LearningWorkspaceFlowTest.recordsSurviveApplicationRestart()` — instantiate baru atas repository pada direktori yang sama, lalu record tugas dan evaluasi lama masih ditemukan dengan ID yang sama.
+
+**Verifikasi langsung saat penyusunan dokumen ini.** Aplikasi dijalankan sungguhan dengan `user.home` diarahkan ke folder sementara. Direktori data terbentuk dengan **12 berkas JSON** (accounts, demo-data, evaluations, goals, learning-access-grants, materials, study-sessions, subjects, tasks, teacher-connection-requests, teacher-invitations, teacher-student-connections) yang seluruhnya terisi. Ini membuktikan alur seeding dan penyimpanan berjalan nyata, bukan sekadar klaim.
+
+**Yang TIDAK bertahan: sesi login.** Token sesi disimpan pada `ConcurrentHashMap` di dalam `SessionRegistry` yang hanya hidup selama proses berjalan:
+
+```java
+/** Process-local session registry; session tokens are not persisted. */
+public final class SessionRegistry {
+    private final Map<String, String> sessions = new ConcurrentHashMap<>();
+```
+
+Artinya, aplikasi yang ditutup lalu dibuka kembali akan meminta pengguna masuk lagi, meskipun data belajarnya tetap ada.
+
+### 9.6 Cara Data Contoh Disediakan
+
+Dijelaskan lengkap pada subbab 5.15 (Fitur N). Ringkasnya:
+
+1. `Main.main()` memanggil `demo.seedIfNeeded()`.
+2. `ensureAccounts()` membuat 7 akun demo bila email-nya belum terdaftar.
+3. `connectAccounts()` menjalankan alur undangan sungguhan sehingga relasi terbentuk melalui kode yang sama dengan yang dipakai pengguna.
+4. `seedCurricula()` membuat 7 mata pelajaran, 10 materi, 12 tugas, 8 sesi, 7 evaluasi, dan 4 target untuk setiap siswa yang belum punya data.
+5. `saveMarkers()` menulis `demo-data.json` berisi daftar ID akun dan ID record demo.
+
+### 9.7 Mencegah Data Contoh Menimpa Data Pengguna
+
+Mekanismenya (terverifikasi oleh `DemoDataServiceTest.seedingIsNotRepeatedAndUserDataIsNotOverwritten()`):
+
+| Aturan | Implementasi |
+|---|---|
+| Akun dicocokkan berdasarkan email | `auth.findByEmail(account.email()).isPresent()` → lewati pembuatan |
+| Record hanya dibuat bila siswa belum punya grant | `hasLearningRecord(studentAccountId)` |
+| Penanda mencegah seeding berulang | `markers.isSeededStudent(studentAccountId)` |
+| Penghapusan tidak dibatalkan | Record yang dihapus tidak akan dibuat ulang karena marker sudah ada |
+
+**Catatan jujur.** Aturan ini berlaku untuk **data contoh yang dibuat oleh `DemoDataService`**. Data yang dibuat sendiri pengguna tetap aman karena hanya disimpan di berkas yang sama, dan tidak ada proses yang meng-encode ulang berkas-berkas itu selain operasi CRUD biasa.
+
+### 9.8 Keterbatasan Penyimpanan Lokal
+
+| Keterbatasan | Penjelasan |
+|---|---|
+| **Tidak ada database relasional** | Tidak ada tabel, kunci asing, indeks, constraint, atau transaksi. Konsistensi dijaga manual oleh kode. |
+| **Tidak ada transaksi lintas berkas** | Operasi yang menyentuh dua berkas (misalnya menyimpan record sekaligus membuat grant) dapat separuh jadi bila aplikasi mati di tengah jalan. |
+| **Tidak ada enkripsi** | Berkas JSON dibaca apa adanya. Hash kata sandi memang aman, tetapi data pribadi dan nilai siswa tidak dilindungi. |
+| **Sesi hilang saat aplikasi ditutup** | Token hanya di memori. |
+| **Tidak ada kontrol akses berkas** | Siapa pun yang punya akses ke folder `user.home` dapat membaca atau mengubah berkas JSON. |
+| **Tidak ada pembatasan percobaan login** | Penyerang dapat mencoba kata sandi tanpa batas. |
+| **Single process** | Dua jendela aplikasi yang berjalan bersamaan pada direktori data yang sama dapat saling menimpa berkas. |
+| **Tidak ada sinkronisasi antar-perangkat** | Data terikat pada satu komputer. |
+| **Volume data terbatas** | Menulis seluruh daftar ke berkas pada setiap penyimpanan akan melambat bila data tumbuh menjadi ribuan baris. |
+| **Tidak ada riwayat perubahan** | Data yang ditulis ulang menimpa nilai lama; tidak ada versi sebelumnya. |
+
+**Batas keamanan yang jujur.** README sudah menyatakan bahwa aplikasi ini **tidak memberi jaminan keamanan setara layanan server**. Yang sudah dilakukan: kata sandi di-hash satu arah dengan PBKDF2-HMAC-SHA256 210.000 iterasi dan salt acak; kode undangan di-hash dengan SHA-256 dan hanya ditampilkan sekali; akun nonaktif otomatis ditolak saat login. Yang **belum** ada: pembatasan percobaan login, verifikasi identitas, enkripsi berkas, dan otomatisasi audit. Untuk penggunaan produksi, data demo harus dihapus dan akses OS ke direktori data dibatasi.
+
+### 9.9 Rencana Penyimpanan ke Depan
+
+1. **Ganti `JsonRepository<T>` dengan `JdbcRepository<T>`** — antarmuka `Repository<T>` sudah disiapkan, sehingga service dan UI tidak perlu berubah.
+2. **Pindahkan grant, relasi, dan status ke skema database** dengan batasan integritas di level DB.
+3. **Tambahkan transaksi** untuk operasi lintas tabel.
+4. **Tambahkan migrasi skema** (Flyway/Liquibase) bila skema berubah.
+5. **Tambahkan enkripsi saat penyimpanan** atau minimalkan data sensitif.
+
+---
+## BAB 10 — Desain UI dan Pengalaman Pengguna
+
+### 10.1 Kerangka Layar
+
+Aplikasi ini memakai **jendela tunggal** dengan dua kondisi yang ditukar melalui `CardLayout`:
+
+```java
+private void showAuth() {
+    root.removeAll();
+    root.add(new AuthScreen(auth, this::showApplication, demo), "auth");
+    layout.show(root, "auth");
+    ...
+}
+
+private void showApplication(UserSession authenticated) {
+    session = authenticated;
+    root.removeAll();
+    root.add(new AppShell(new Workspace(auth, connections, learning, legacy, demo, authenticated),
+            this::signOut), "app");
+    layout.show(root, "app");
+    ...
+}
+```
+
+| Kondisi | Komponen | Isi |
+|---|---|---|
+| "auth" | `AuthScreen` | Kartu masuk dan kartu registrasi, berada di dalam gradien yang sama. |
+| "app" | `AppShell` | Sidebar kiri, bar atas, dan area konten yang bertukar halaman. |
+
+Ukuran jendela: minimum 1120 x 720, default 1360 x 860, dipusatkan di layar.
+
+### 10.2 Layar Login dan Registrasi
+
+Layar login dibangun dari `GlassPanel` di atas `GlassCanvas` bergradasi. Isinya:
+
+- **Kartu utama** dengan logo aplikasi (mark "H" glossy 3D berwarna biru ke ungu) dan wordmark "HomeLearn", judul "Selamat datang kembali", dan deskripsi singkat.
+- **Dua field:** Email dan Kata sandi (`JPasswordField`).
+- **Tombol "Masuk"** (varian primer) dan tautan **"Belum punya akun? Daftar"**.
+- **Area pesan galat** di bawah kartu. Pesan berwarna merah untuk galat, hijau untuk keberhasilan (setelah registrasi).
+- **Strip "Akun demo siap pakai"** yang memuat daftar email dan kata sandi akun demo, sehingga akun demo bisa langsung dicoba tanpa mengetik.
+
+Layar registrasi memakai `CardLayout` yang sama (`LOGIN` / `REGISTER`), sehingga perpindahan mode tidak membangun ulang layout dan tidak menimbulkan kedipan. Field **Jenjang pendidikan** hanya muncul dan hanya aktif bila peran yang dipilih adalah Siswa — implementasinya berupa `setVisible`/`setEnabled` pada baris field.
+
+**Pengaman input kata sandi.** Setelah submit, array `char[]` kata sandi dikosongkan dengan `Arrays.fill(secret, '\0')` dan field `JPasswordField` dikosongkan, baik pada alur berhasil maupun gagal. Ini mengurangi jejak kata sandi di memori.
+
+### 10.3 Navigasi: Sidebar
+
+Sidebar dibangun oleh `Sidebar` (extends `JPanel`, `BorderLayout`) yang berisi satu `GlassPanel` permukaan. Isinya:
+
+- **Bagian atas (brand):** logo aplikasi (mark "H" glossy 3D, digambar vektor), judul "HomeLearn", dan subjudul "Ruang belajar pribadi".
+- **Bagian tengah:** daftar menu yang dikelompokkan menjadi section berlabel.
+- **Bagian bawah (footer):** "Penyimpanan lokal · data tersimpan di perangkat" — pengingat bahwa data lokal.
+
+**Struktur menu (identik untuk kedua peran, kecuali baris terakhir):**
+
+| Section | Item | Peran |
+|---|---|---|
+| Ringkasan | Dashboard | keduanya |
+| Pembelajaran | Mata pelajaran, Jadwal belajar, Materi, Tugas, Target belajar, Evaluasi, Laporan progres | keduanya |
+| Akun | Data pengajar, Data siswa, Profil saya | keduanya |
+| Koneksi | **Permintaan siswa**, **Undangan** | **hanya pengajar** |
+| Koneksi | **Koneksi pengajar** | **hanya siswa** |
+
+Pemisahan ini bukan sekadar kosmetik: `AppShell.buildNavigation()` **tidak mendaftarkan** halaman pengajar untuk peran siswa, sehingga halaman tersebut benar-benar tidak ada di objek shell — bukan sekadar disembunyikan. Hal ini diuji:
+
+```java
+@Test void studentShellDoesNotExposeTeacherOnlyPages() {
+    AppShell shell = new AppShell(new Workspace(environment.auth, environment.connections, environment.learning, student), () -> { });
+    assertNotNull(shell.page("connections"));
+    assertTrue(shell.page("requests") == null);
+    assertTrue(shell.page("invitations") == null);
+}
+```
+
+Item menu yang aktif digambar ulang: `NavItem.paintComponent()` menggambar permukaan accent translucent dan batang aksen 3 piksel di sisi kiri. Ikon adalah **vektor yang digambar sendiri** (`NavIcon`), bukan font ikon atau gambar PNG — ada 14 ikon: DASHBOARD, SUBJECT, SCHEDULE, MATERIAL, TASK, GOAL, EVALUATION, PROGRESS, TEACHERS, STUDENTS, PROFILE, REQUESTS, INVITATION, CONNECTION.
+
+### 10.4 Bar Atas (TopBar)
+
+Bar atas berupa `GlassPanel` dengan tiga bagian:
+
+- **Kiri:** untuk pengajar, caption "Siswa:" dan `JComboBox` pemilih siswa; untuk siswa, teks statis "Ruang belajar siswa".
+- **Kanan:** tombol **"Keluar"**.
+- **Tengah/kanan:** *account chip* — avatar bundar berisi inisial, nama, dan peran.
+
+**Pemilih siswa adalah elemen penting.** Bagi pengajar yang memiliki beberapa siswa, aplikasi ini memakai pola "satu cakupan aktif": pengajar memilih satu siswa, lalu seluruh halaman belajar menampilkan data siswa itu. Ini membuat arsitektur data tetap sederhana dan aman.
+
+Detail teknis yang baik untuk ditunjukkan: ketika `JComboBox` dibangun ulang, ia memunculkan event action yang biasanya dapat memicu lingkaran. Kode ini mencegahnya dengan flag `updatingScope`:
+
+```java
+updatingScope = true;
+try {
+    scopeCombo.removeAllItems();
+    List<AccountSummary> students = workspace.learning().connectedStudents(workspace.session().token());
+    for (AccountSummary student : students) scopeCombo.addItem(student);
+    ...
+} finally {
+    updatingScope = false;
+}
+```
+
+### 10.5 Dashboard
+
+Layout dashboard: header (judul + deskripsi), deretan **5 kartu statistik** (`StatCard`), lalu dua kolom — kolom kiri berisi kartu "Jadwal terdekat" dan "Tugas terdekat", kolom kanan berisi kartu "Aktivitas terbaru".
+
+- `StatCard` menampilkan caption (font 12), nilai besar (font 24), dan hint kecil (font 11). Nilai kosong tampil sebagai "—".
+- Tabel di dalam kartu memakai `JTable` dengan `DefaultTableModel` yang `isCellEditable` selalu `false`, sehingga data hanya-baca.
+- "Aktivitas terbaru" menampilkan baris manual: tag kategori, judul, detail, dan tanggal rata kanan.
+
+### 10.6 Tabel Data (DataTable)
+
+Semua halaman data memakai komponen generik `DataTable<T>`. Ciri-cirinya:
+
+| Fitur | Detail |
+|---|---|
+| Kolom | Diberikan sebagai `String[]` |
+| Sumber data | `Supplier<List<T>>` — dipanggil setiap kali tabel disegarkan |
+| Pemetaan baris | `Function<T, Object[]>` |
+| Pencarian | Kotak teks "Cari" dengan pencocokan `contains` tanpa membedakan huruf besar-kecil di seluruh sel |
+| Filter kolom | Dropdown per kolom, selalu memuat pilihan "Semua …" |
+| Empty state | Dua jenis: "belum ada data" dan "tidak ada hasil yang cocok" |
+| Status pill | `DataTable.statusRenderer()` menggambar label berwarna sesuai status |
+| Tombol aksi | Ditambahkan lewat `table.addAction(component)` |
+| Baris | Tinggi 40 piksel, zebra baris, header tebal |
+
+### 10.7 Formulir (FormDialog)
+
+`FormDialog` menyediakan dialog formulir generik yang dipakai semua halaman tambah/edit.
+
+**Jenis field yang tersedia:**
+
+| Factory | Tipe kontrol | Wajib? |
+|---|---|---|
+| `Field.text(key, label, value)` | `JTextField` | Ya |
+| `Field.optionalText(key, label, value)` | `JTextField` | Tidak |
+| `Field.password(key, label)` | `JPasswordField` | Ya |
+| `Field.multiline(key, label, value, rows)` | `JTextArea` | Tidak |
+| `Field.choice(key, label, options, selected)` | `JComboBox<T>` | Ya |
+
+**Perilaku penting:**
+- Field wajib yang kosong ditolak dengan pesan "… wajib diisi." dan dialog **tidak** ditutup.
+- Bila callback penyimpanan melempar exception, pesan errornya tampil di dalam dialog dan dialog tetap terbuka agar pengguna dapat memperbaiki.
+- Nilai dikirim ke callback dalam bentuk `Map<String, Object>`; nilai `JPasswordField` dikirim sebagai `char[]`.
+- Tombol `Esc` menutup dialog.
+- Dialog dibangun di atas `GlassDialog` yang frameless (tanpa border OS) dan bisa **diseret** lewat judulnya.
+
+### 10.8 Dialog Detail
+
+`DetailDialog` menampilkan isi lengkap satu record dengan beberapa bagian (`Section`) berurutan, dialog berukuran tetap 720 x 640, dan badan dapat digulir. Isi dialog disusun di dalam `JTextPane` bergaya: judul bagian dicetak tebal, sedangkan teks isi memakai font 13. Dipakai pada "Lihat materi", "Lihat tugas", "Lihat nilai", dan "Lihat detail".
+
+### 10.9 Dialog Pesan
+
+`Dialogs` menyediakan lima jenis pesan yang semuanya dibangun di atas `GlassDialog`:
+
+| Metode | Jenis | Perilaku |
+|---|---|---|
+| `info(...)` | INFO | Pesan informatif |
+| `success(...)` | SUCCESS | Konfirmasi berhasil |
+| `warn(...)` | WARNING | Peringatan |
+| `error(...)` | ERROR | Kegagalan, biasanya menyertakan pesan exception |
+| `confirm(...)` | — | Mengembalikan `true` bila pengguna memilih "Ya, lanjutkan" |
+| `code(...)` | — | Menampilkan kode undangan besar dan dapat disalin |
+
+Ada satu detail teknis yang baik untuk diperiksa saat demo: `GlassDialog` memeriksa `GraphicsEnvironment.isHeadless()`. Bila aplikasi dijalankan di lingkungan tanpa layar (server), pesan dicetak ke `System.err` dan `confirm()` mengembalikan `false` — sehingga pengujian otomatis tidak pernah terkunci.
+
+### 10.10 Gaya Visual: "Liquid Glass" — Apa yang Sebenarnya Diterapkan
+
+Ini bagian yang perlu dijelaskan **secara jujur**, karena sering disalahpahami.
+
+**Yang benar-benar ada:**
+1. **Permukaan translucent bertingkat.** `GlassPanel` menggambar dengan `GradientPaint` dari warna terang ke gelap, di atas warna dasar yang memiliki nilai alpha (misalnya `Theme.GLASS` = `#FFFFFFC6`, alpha 198).
+2. **Latar bergradasi dengan "blooms".** `Glass.paintCanvas()` mengisi latar dengan `GradientPaint` vertikal dan menambahkan tiga `RadialGradientPaint` berwarna biru es dan lavender.
+3. **Bayangan lembut berlapis.** Dua bayangan rounded dengan offset +4 dan +8 piksel.
+4. **Sisi highlight.** Garis putih 1 piksel yang melengkung, ditambah garis specular horizontal di bagian atas.
+5. **Tombol dan ikon vektor digambar sendiri.** `GlassButton` menggambar seluruh permukaannya; `NavIcon` menggambar ikon dari `RoundRectangle2D`, `Ellipse2D`, dan `Path2D`.
+6. **Dialog frameless yang bisa diseret** dengan warna latar jendela sepenuhnya transparan.
+
+**Yang TIDAK ada (dan ini penting untuk diklarifikasi):**
+- **Tidak ada blur sungguhan.** Tidak ada `AlphaComposite`, `BlurOp`, `ConvolveOp`, atau `ImageFilter` di seluruh project.
+- Sumbernya sendiri menjelaskan hal ini di `Glass.java`:
+
+> *"The frost itself is a convincing approximation rather than a real blur: Swing has no dependable backdrop filter, and a per-frame blur would repaint the whole window on every mouse move. Instead a translucent white body, a soft vertical sheen, a luminous top edge and a diffused shadow reproduce the depth of frosted glass at a fraction of the cost."*
+
+Jadi, gaya "kaca frosted" yang tampil adalah **simulasi**: lapisan tembus pandang dengan gradien, highlight, dan bayangan — bukan pengaburan konten di belakangnya.
+
+**Token warna utama (`Theme`):**
+
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `ACCENT` | `#4F46E5` | Aksen utama, tombol primer, menu aktif |
+| `ACCENT_HOVER` / `ACCENT_PRESSED` | `#4338CA` / `#3730A3` | Keadaan tombol |
+| `ACCENT_SOFT` | `#EBEAFD` | Latar aksen lembut |
+| `CANVAS_TOP` / `CANVAS_BOTTOM` | `#F4F8FF` / `#D6E0F5` | Gradien latar |
+| `GLASS` | `#FFFFFFC6` | Permukaan kaca semi transparan |
+| `GLASS_SOLID` | `#FBFCFFF8` | Sidebar, bar atas, dialog (hampir pekat) |
+| `TEXT` / `TEXT_MUTED` / `TEXT_SUBTLE` | `#1A1D28` / `#5E6577` / `#868EA1` | Hierarki teks |
+| `SUCCESS` / `WARNING` / `DANGER` / `INFO` | `#0F7654` / `#A9500A` / `#B91C1C` / `#1D4ED8` | Warna status |
+
+**Tipografi.** `Theme` memilih keluarga font dengan urutan preferensi "Inter", "Segoe UI", "Tahoma", lalu fallback `Font.SANS_SERIF`, sehingga tampilan tetap baik di komputer yang tidak memasang Inter. Ukuran yang dipakai: 10, 11, 12, 13, 14, 16, 20, 24, 28.
+
+**Ruang dan bentuk.** Skala spasi `SPACE_1` sampai `SPACE_8` (4 sampai 40 piksel); radius `RADIUS_SM` (10), `RADIUS` (16), `RADIUS_LG` (22); tinggi kontrol standar 36 piksel; lebar sidebar 236 piksel.
+
+### 10.11 Logo Aplikasi
+
+Logo aplikasi, `AppLogo` di package `ui.design`, terdiri dari dua bagian:
+
+**1. Mark "H".** Huruf H dibentuk dari dua batang kapsul tegak (kiri biru, kanan ungu) yang dihubungkan oleh pita melengkung. Setiap bagian digambar dengan detail berikut:
+
+| Elemen | Cara digambar |
+|---|---|
+| Batang kiri | Kapsul (rounded rectangle dengan radius setengah lebar), gradien vertikal `#6FC8FF` → `#1E7BE0` |
+| Batang kanan | Kapsul, gradien vertikal `#C9AEFF` → `#7C3AED` |
+| Pita penghubung | `CubicCurve2D` dengan `BasicStroke` ujung bulat, gradien horizontal `#C7E6FF` → `#4F46E5` |
+| Bayangan pita | Salinan pita yang digeser 2 satuan ke bawah dengan warna gelap transparan, supaya pita terlihat melayang di depan batang |
+| Kilau batang | Gradien putih transparan pada seperempat atas batang, dijepit dengan `Shape.clip` |
+| Kilau pita | Garis putih tipis yang mengikuti kurva pita pada bagian atasnya |
+| Rim light | Garis putih 1 piksel mengikuti tepi batang |
+| Bayangan dasar | Ellipse biru sangat transparan di bawah mark |
+
+**2. Wordmark "HomeLearn".** Tulisan tebal dengan `GradientPaint` horizontal `#1B7FE8` → `#7C3AED`, mengikuti gradien yang sama dengan mark.
+
+**Logo dipakai di tiga tempat:**
+
+| Tempat | Bentuk | Ukuran |
+|---|---|---|
+| Sidebar (kiri atas) | Mark saja | 34 x 34 piksel |
+| Layar masuk (kartu) | Mark | 40 x 40 piksel |
+| Ikon jendela aplikasi | Mark, di-render ke `BufferedImage` 64 x 64 | 64 x 64 piksel |
+
+**Mengapa digambar, bukan memakai berkas PNG.** Seluruh `ui.design` dibangun dengan prinsip "the application ships without image assets" (lihat komentar pada `NavIcon`). Logo yang digambar vektor tetap tajam pada monitor resolusi tinggi maupun skalasi DPI, tidak menambah berkas biner ke repository, dan ukurannya bebas diubah tanpa penurunan kualitas.
+
+**TAPI:** bila artwork PNG resmi tersedia, aplikasi **otomatis** memakainya. Cukup letakkan berkas bernama `logo.png` di `src/main/resources/`, lalu build ulang. `AppLogo` mendeteksinya lewat `getResourceAsStream("/logo.png")` dan menggambar berkas itu sebagai ganti mark vektor — **tanpa perubahan kode sama sekali**. Folder `src/main/resources/` beserta petunjuknya sudah disiapkan.
+
+---
+
+### 10.12 Konsistensi dan Kemudahan Penggunaan
+
+**Yang membuat konsisten:**
+- Semua token visual berasal dari satu sumber (`Theme`), bukan angka warna yang ditulis berulang.
+- Semua halaman data memakai `DataTable<T>` dan `FormDialog` yang sama, sehingga perilaku pencarian, filter, validasi, dan pesan galat seragam.
+- Semua pesan galat ditulis dalam bahasa Indonesia dan menyebutkan apa yang harus diperbaiki, bukan hanya kode error.
+- Empty state menjelaskan **apa yang harus dilakukan berikutnya**, bukan sekadar "tidak ada data".
+
+**Yang masih kurang dan direncanakan:**
+- Belum ada mode gelap (tema gelap) — seluruh token bersifat terang.
+- Belum ada pengaturan ukuran font atau skala antarmuka.
+- Belum ada tooltip pada sebagian besar tombol; baru ada pada field yang membingungkan.
+- Belum ada navigasi keyboard (shortcut) dan belum ada Breadcrumb.
+- Belum ada pengaturan tampilan kolom tabel (sembunyikan/urutkan kolom).
+
+### 10.13 Tangkapan Layar Aktual
+
+Harness `tools/UiShowcase.java` membuka halaman-halaman **sungguhan** (bukan tiruan) dan menyimpan 22 tangkapan layar PNG ke `target/screenshots/`. Daftar berkas yang dihasilkan:
+
+```text
+01-login.png                     12-pengajar-profil.png
+02-pengajar-dashboard.png        13-siswa-dashboard.png
+03-pengajar-mata-pelajaran.png   14-siswa-materi.png
+04-pengajar-materi.png           15-siswa-tugas.png
+05-pengajar-tugas.png            16-siswa-laporan-progres.png
+06-pengajar-jadwal.png           17-siswa-data-pengajar.png
+07-pengajar-evaluasi.png         18-siswa-koneksi.png
+08-pengajar-laporan-progres.png  19-kosong-dashboard-pengajar.png
+09-pengajar-data-siswa.png       20-kosong-mata-pelajaran.png
+10-pengajar-permintaan.png       21-detail-materi.png
+11-pengajar-undangan.png         22-form-tambah.png
+```
+
+Tangkapan layar ini dapat dipakai sebagai lampiran saat presentasi.
+
+---
+## BAB 11 — Status Prototype untuk UTS
+
+### 11.1 Hasil Verifikasi yang Ditemukan Saat Menyusun Dokumen Ini
+
+Verifikasi dilakukan langsung di folder project `D:\my-projects\Homeschooling`.
+
+| Verifikasi | Perintah / Cara | Hasil |
+|---|---|---|
+| Kompilasi | `mvnw.cmd clean test` (JDK 21.0.12.1 Temurin, Maven 3.9.16) | **Berhasil.** 80 file sumber dan 16 file test dikompilasi tanpa error. |
+| Pengujian otomatis | `mvnw.cmd clean test` | **Berhasil.** 67 test pada 16 kelas test: **0 gagal, 0 error, 0 skipped**. Durasi sekitar 3 menit 10 detik. |
+| Pelaporan test | `target/surefire-reports/` | 15 berkas `.txt` dan 15 berkas `.xml` terbentuk. |
+| Menjalankan aplikasi | `java -cp "target\classes;lib\*" id.edu.homeschool.Main` | **Berhasil.** Jendela terbuka dan proses tetap hidup. |
+| Pembentukan data | Pengamatan direktori data saat aplikasi berjalan | **Berhasil.** 12 berkas JSON terbentuk dan terisi (accounts, demo-data, evaluations, goals, learning-access-grants, materials, study-sessions, subjects, tasks, dan tiga berkas koneksi). |
+| Tangkapan layar | `tools/UiShowcase.java` | **Berhasil.** 22 PNG ditulis di `target/screenshots/`. |
+
+### 11.2 Tabel Status Per Fitur
+
+| Fitur / Komponen | Status Aktual | Bukti / Dasar Penilaian | Kekurangan | Langkah Berikutnya |
+|---|---|---|---|---|
+| Build Maven (`pom.xml`, `mvnw.cmd`) | **Sudah berfungsi** | `mvnw.cmd clean test` → BUILD SUCCESS | Belum ada konfigurasi `maven-jar-plugin` untuk paket jar distributable | Tambahkan plugin jar dan profil `release` |
+| Pengujian otomatis (67 test) | **Sudah berfungsi** | `target/surefire-reports/*.txt` | Belum ada pengujian UI bergaya (EventQueue) dan belum ada cakupan kode (JaCoCo) | Tambahkan JaCoCo dan target cakupan ≥ 80% |
+| Login | **Sudah berfungsi** | `AuthFlowTest`, `AuthScreenTest` (tombol benar-benar ditekan) | Tidak ada pembatasan percobaan login | Tambahkan lockout sementara + log percobaan |
+| Registrasi siswa | **Sudah berfungsi** | `AuthFlowTest.registerLoginLogoutWorksAndAccountSurvivesRestart()` | Tidak ada verifikasi email | Tambahkan alur verifikasi email |
+| Registrasi pengajar | **Sebagian berfungsi** | `AuthService.registerTeacher()` bekerja, tetapi **tanpa persetujuan admin** | Pengajar bisa mendaftarkan diri sendiri tanpa verifikasi | Tambahkan peran `ADMIN` + alur persetujuan |
+| Logout | **Sudah berfungsi** | `MainFrame.signOut()` → `AuthService.logout()` | Sesi tidak bisa dicabut dari perangkat lain | Tambahkan daftar sesi aktif |
+| Validasi kata sandi | **Sudah berfungsi** | `AuthService.validatePassword()` (12–128 karakter, huruf + angka); hash PBKDF2 210.000 iterasi | Tidak ada kamus kata sandi yang lemah | Tambahkan pemeriksaan kata sandi umum |
+| Sesi | **Sebagian berfungsi** | `SessionRegistry` + `UserSession`; token 32 byte acak | Token hilang saat aplikasi ditutup; tidak ada masa berlaku | Tambahkan masa berlaku token dan simpan sesi |
+| Dashboard | **Sudah berfungsi** | `AppShellSmokeTest`, `LearningActivityTest` | Hanya satu siswa; tanpa grafik atau filter periode | Tambahkan mode ringkasan semua siswa |
+| Data pengajar (direktori) | **Sudah berfungsi** | `AppShellSmokeTest.directoryPagesListTheConnectedPeople()` | Field keahlian/kualifikasi belum bisa diedit dari UI | Tambahkan field ke `UserAccount` dan form profil |
+| Data siswa (direktori) | **Sudah berfungsi** | `AppShellSmokeTest.switchingTheSelectedStudentSwapsTheVisibleRows()` | Tanpa impor massal | Tambahkan impor CSV |
+| Kode undangan | **Sudah berfungsi** | `ConnectionServiceTest.codeIsStoredAsHashStudentRequestsAndTeacherApprovalCreatesActiveRelation()` | Kode hanya berlaku di satu perangkat (salin-tempel) | Tambahkan QR code |
+| Permintaan koneksi | **Sudah berfungsi** | `ConnectionFlowTest` (7 test) | Tanpa notifikasi otomatis | Tambahkan notifikasi dalam aplikasi |
+| Persetujuan / penolakan | **Sudah berfungsi** | `ConnectionFlowTest.invitationRequestApprovalAndActiveRelation()` | — | — |
+| Pengakhiran koneksi | **Sudah berfungsi** | `ConnectionFlowTest.teacherCanEndAnActiveConnection()` | Data tetap ada tapi tidak ada arsip "koneksi ditutup" | Tambahkan tampilan riwayat |
+| Mata pelajaran (CRUD) | **Sudah berfungsi** | `AppShellSmokeTest`, `LearningWorkspaceFlowTest` | Tanpa kurikulum/tingkat | Tambahkan struktur kurikulum |
+| Jadwal belajar (CRUD) | **Sudah berfungsi** | `LearningWorkspaceFlowTest.teacherCreatesRecordsAndStudentSeesThem()` | Tanpa jadwal berulang dan deteksi bentrok | Tambahkan pola mingguan |
+| Materi (CRUD + isi) | **Sudah berfungsi** | `DemoDataServiceTest.everyMaterialCarriesUsableContent()` | Tanpa lampiran berkas | Tambahkan manajemen lampiran |
+| Tugas (CRUD + status) | **Sudah berfungsi** | `LearningWorkspaceFlowTest.studentOnlyMarksOwnTaskAndOnlyTheCompletionFlag()` | Tanpa unggah jawaban | Tambahkan fitur pengumpulan tugas |
+| Evaluasi (CRUD) | **Sudah berfungsi** | `EvaluationTest` (3 test) | Tanpa jenis penilaian dan bobot | Tambahkan kategori penilaian |
+| Target belajar (CRUD) | **Sudah berfungsi** | `LearningWorkspaceFlowTest.goalAchievementIsTeacherControlled()` | Tanpa kurva kemajuan | Tambahkan grafik capaian |
+| Laporan progres | **Sudah berfungsi** | `LearningWorkspaceFlowTest.progressReportReflectsRepositoryData()` | Tanpa filter periode, ekspor, atau cetak | Tambahkan filter tanggal dan ekspor PDF |
+| Profil + ubah kata sandi | **Sebagian berfungsi** | `AuthFlowTest.profileCanBeUpdatedAndPasswordChanged()` | Tanpa pengaturan tema, notifikasi, atau hapus akun | Tambahkan halaman Pengaturan terpisah |
+| Pencarian & filter | **Sudah berfungsi** | `AppShellSmokeTest.teacherTableShowsRepositoryDataAndSearchFiltersIt()` | Tidak mencari di kolom multiline | Tambahkan pencarian isi |
+| Data demo | **Sudah berfungsi** | `DemoDataServiceTest` (6 test) | Tidak ada tombol hapus/muat ulang data demo dari UI | Tambahkan menu "Kelola data demo" |
+| Arsip data pra-akun | **Sebagian berfungsi** | `LearningWorkspaceServiceTest.legacyRecordsWithoutGrantStayInvisible()` | Hanya baca; tidak ada alat migrasi | Buat wizard migrasi dengan verifikasi |
+| Penyimpanan JSON | **Sudah berfungsi** | `JsonRepositoryTest` (2 test); 12 berkas terbentuk saat aplikasi dijalankan | Tanpa transaksi lintas berkas, tanpa enkripsi | Tambahkan repository JDBC (interface sudah siap) |
+| Persistensi data | **Sudah berfungsi** | `LearningWorkspaceFlowTest.recordsSurviveApplicationRestart()` | Data terikat satu perangkat | Tahapkan sinkronisasi atau multi-user |
+| Gaya visual "glass" | **Sudah berfungsi** | Permukaan translucent, gradien, bayangan, highlight, dan ikon vektor **sudah terpasang**. `Glass.paintBloom()` sudah diperbaiki sehingga ketiga "bloom" radier tergambar dan `stderr` bersih (lihat 11.4) | Belum ada mode gelap dan belum ada blur sungguhan (efek kaca adalah simulasi) | Tambahkan tema gelap pada token `Theme` |
+| Tangkapan layar | **Sudah berfungsi** | 22 PNG di `target/screenshots/` | Harness berada di luar build Maven (`tools/`) | Pindahkan ke modul uji integrasi |
+| Logo aplikasi | **Sudah berfungsi** | `AppLogo` menggambar mark "H" vektor + wordmark "HomeLearn"; dipakai di sidebar, layar masuk, dan ikon jendela | Belum ada artwork PNG resmi | Simpan `logo.png` di `src/main/resources/` untuk memakai artwork asli |
+| Ekspor laporan | **Direncanakan** | — | Tidak ada di source code | Tahap UAS |
+| Pengingat tenggat | **Direncanakan** | — | Tidak ada di source code | Tahap UAS |
+| Lampiran berkas materi | **Direncanakan** | — | Tidak ada di source code | Tahap UAS |
+| Peran admin / verifikasi pengajar | **Direncanakan** | — | Tidak ada peran `ADMIN` | Tahap UAS |
+
+### 11.3 Alur Mana yang Dapat Didemonstrasikan
+
+**Seluruh alur berikut sudah terverifikasi dan dapat diperagakan:**
+
+| # | Alur demo | Durasi | Keluar yang terlihat |
+|---|---|---|---|
+| 1 | Buka aplikasi → layar login tampil dengan daftar akun demo | ± 10 detik | Strip "Akun demo siap pakai" |
+| 2 | Masuk sebagai pengajar `rani@demo.test` | ± 10 detik | Dashboard pengajar dengan 5 kartu statistik terisi |
+| 3 | Ganti siswa pada bar atas | ± 5 detik | Seluruh angka dan tabel berubah mengikuti siswa |
+| 4 | Buka Materi → "Lihat materi" → baca isi lengkap | ± 15 detik | Dialog berisi tujuan, pembahasan, contoh, latihan, kunci jawaban |
+| 5 | Tambah tugas baru untuk siswa terpilih | ± 20 detik | Baris baru di tabel; tugas muncul di dashboard siswa |
+| 6 | Tambah evaluasi, lihat rata-rata berubah di Laporan progres | ± 20 detik | Ringkasan laporan dan tabel per mata pelajaran |
+| 7 | Masuk sebagai siswa `dimas@demo.test` → lihat halaman yang sama | ± 15 detik | Tampilan mode baca; tombol tambah/edit/hapus tidak ada |
+| 8 | Siswa menandai tugas "Tandai selesai" | ± 10 detik | Status berubah "Belum selesai" → "Selesai" |
+| 9 | Pengajar → Undangan → buat kode → siswa → Koneksi pengajar → kirim kode → pengajar → Permintaan siswa → Setujui | ± 60 detik | Relasi aktif; siswa mendapat akses data baru |
+| 10 | Pengajar → Data siswa → "Akhiri koneksi" | ± 20 detik | Siswa kehilangan akses; record tetap tersimpan |
+| 11 | Keluar (tombol "Keluar") | ± 5 detik | Kembali ke layar login |
+| 12 | Tutup lalu buka aplikasi, masuk lagi | ± 20 detik | Data yang tadi dibuat masih ada |
+
+### 11.4 Cacat Nyata yang Ditemukan Saat Verifikasi (dan cara perbaikannya)
+
+Bagian ini mendokumentasikan satu temuan nyata dari proses verifikasi, sekaligus menunjukkan bagaimana temuan itu ditangani.
+
+**Temuan.** Saat aplikasi dijalankan sungguhan untuk pertama kalinya, `stderr` menampilkan exception berikut pada AWT Event Dispatch Thread:
+
+```text
+java.lang.IllegalArgumentException: Fraction values must be in the range 0 to 1: 28.266
+    at java.awt.MultipleGradientPaint.<init>(MultipleGradientPaint.java:181)
+    at java.awt.RadialGradientPaint.<init>(RadialGradientPaint.java:456)
+    at id.edu.homeschool.ui.design.Glass.paintBloom(Glass.java:96)
+    at id.edu.homeschool.ui.design.Glass.paintCanvas(Glass.java:84)
+    at id.edu.homeschool.ui.design.GlassCanvas.paintComponent(GlassCanvas.java:21)
+```
+
+**Penyebab (terverifikasi pada source code).** Di `Glass.paintBloom()` terdapat:
+
+```java
+float inner = radius * 0.05f;
+graphics.setPaint(new java.awt.RadialGradientPaint(center, radius, new float[]{inner, radius},
+        new Color[]{Theme.alpha(color, color.getAlpha()), Theme.alpha(color, 0)}));
+```
+
+Konstruktor `RadialGradientPaint(Point2D, float, float[], Color[])` memperlakukan nilai dalam larik `fractions` sebagai **fraksi 0..1**, bukan sebagai ukuran piksel. Kode ini memberikan `radius` dalam satuan piksel (sekitar 565–571 piksel untuk jendela 1360 x 860) ke larik `fractions`, sehingga nilainya jauh di atas 1 dan konstruktor menolak.
+
+**Dampak saat cacat itu masih ada.**
+- **Fungsionalitas tidak terganggu.** Latar dasar bergradien tetap tergambar, seluruh komponen UI tetap tampil dan dapat diklik, dan seluruh test tetap lulus. Exception tertangkap oleh handler bawaan EDT, sehingga aplikasi tidak berhenti.
+- **Dampak kosmetik.** Tiga "bloom" radier (efek cahaya lembut di latar) **tidak tergambar**. Latar terlihat lebih datar daripada desain yang dimaksud.
+- **`stderr` tidak kosong**, yang terlihat jelas saat aplikasi dijalankan dari terminal.
+
+**Mengapa cacat ini tidak tertangkap oleh harness tangkapan layar.** `tools/UiShowcase.java` memasang halaman di dalam `JFrame` biasa, sedangkan aplikasi sebenarnya memasang `GlassCanvas` sebagai content pane. `GlassCanvas.paintComponent()` yang memanggil `Glass.paintCanvas()` hanya terpakai pada entry point produksi. Karena itu harness berhasil menggambar 22 tangkapan layar tanpa exception, sementara aplikasi sungguhan memunculkannya. Ini pelajaran yang berguna: **harness pengujian tampilan belum tentu memakai jalur kode yang sama dengan entry point aplikasi.**
+
+**Status saat dokumen ini ditulis: SUDAH DIPERBAIKI.** Source code `Glass.paintBloom()` kini berisi:
+
+```java
+graphics.setPaint(new java.awt.RadialGradientPaint(center, radius, new float[]{0f, 1f},
+        new Color[]{Theme.alpha(color, color.getAlpha()), Theme.alpha(color, 0)}));
+```
+
+Larik `fractions` sekarang bernilai `{0f, 1f}`, yaitu rentang fraksi yang sah. Verifikasi ulang setelah perbaikan:
+
+| Pemeriksaan | Hasil |
+|---|---|
+| `mvnw.cmd clean test` | BUILD SUCCESS — 67 test, 0 gagal |
+| Menjalankan `id.edu.homeschool.Main` | Proses tetap hidup, jendela terbuka |
+| Isi `stderr` selama aplikasi berjalan | **0 byte** (bersih) |
+| Berkas data yang terbentuk | 12 berkas JSON, seluruhnya terisi |
+| Tangkapan layar | 22 PNG berhasil digambar ulang |
+
+Artinya **tidak ada cacat terbuka yang diketahui** pada prototype saat dokumen ini ditulis. Dengan demikian, temuan ini tetap dicatat sebagai bukti cara verifikasi dilakukan dan sebagai bahan ajar: pemeriksaan source code saja tidak cukup — aplikasi harus benar-benar dijalankan.
+
+
+### 11.5 Hal yang Belum Dapat Dipastikan dari Source Code
+
+Hal-hal berikut **tidak** dapat disimpulkan hanya dari membaca kode dan harus diuji atau diukur:
+
+| Hal | Mengapa belum pasti |
+|---|---|
+| Kecepatan pada jumlah data besar (misalnya 10.000 tugas) | Penyimpanan menulis ulang seluruh berkas pada setiap perubahan; perilaku pada skala besar belum diukur. |
+| Perilaku pada sistem berkas jaringan (Network drive) | `ATOMIC_MOVE` mungkin tidak didukung; sudah ada fallback, tetapi belum diuji pada jaringan. |
+| Tampilan pada monitor dengan skala DPI berbeda | Seluruh ukuran ditulis dalam piksel absolut, belum diuji pada 125% / 150% scaling. |
+| Perilaku pada sistem operasi selain Windows | Project ini hanya pernah dijalankan di Windows pada Windows. |
+| Keamanan berkas JSON di komputer bersama | Secara teknis dapat dibaca siapa pun yang punya akses folder; belum ada uji keamanan penetration. |
+| Kesesuaian dengan kurikulum resmi | Model mata pelajaran bersifat bebas; belum ada pemetaan ke kurikulum nasional. |
+| Dampak aplikasi terhadap hasil belajar | Butuh penelitian longitudinal, di luar cakupan UTS. |
+
+---
+## BAB 12 — Panduan Demo UTS
+
+### 12.1 Prasyarat
+
+| Kebutuhan | Keterangan | Status di komputer verifikasi |
+|---|---|---|
+| **JDK 21** | `javac` dan `java` versi 21. `pom.xml` menetapkan `maven.compiler.source/target = 21`. | Terpasang (Temurin 21.0.12.1) |
+| **Apache NetBeans** | IDE dengan dukungan project Maven. | NetBeans menyediakan Maven bawaan. |
+| **Maven** | Tidak wajib dipasang — project sudah menyertakan Maven Wrapper. | `mvn` **tidak ada** di PATH; `mvnw.cmd` yang dipakai. |
+| **Koneksi internet** | Hanya dibutuhkan sekali, saat Maven Wrapper mengunduh Maven 3.9.16 (bukan tiap build). | Sudah terunduh ke `~/.m2/wrapper/dists/`. |
+
+> **Penting:** perintah `mvn` (bukan `mvnw.cmd`) **tidak tersedia** pada PATH di lingkungan verifikasi. Selalu gunakan `mvnw.cmd` di Windows.
+
+### 12.2 Langkah 1: Membuka Project di Apache NetBeans
+
+1. Buka **Apache NetBeans**.
+2. Menu **File → Open Project…**
+3. Arahkan ke folder `D:\my-projects\Homeschooling` (folder yang berisi `pom.xml`), lalu **Open**.
+4. NetBeans akan membaca `pom.xml` sebagai project Maven dan mengunduh dependensi (Jackson, JUnit) bila belum ada di repositori lokal.
+5. Tunggu sampai Navigator menampilkan package `id.edu.homeschool`.
+
+### 12.3 Langkah 2: Memastikan JDK Sesuai
+
+1. Buka **Project Properties** (klik kanan project → **Properties**).
+2. Pindah ke tab **Build - Compile**.
+3. Pastikan **Java Platform** = **JDK 21**.
+4. Bila JDK 21 belum terdaftar, klik **Manage Java Platforms → Add Java Platform → Add JDK** dan arahkan ke folder JDK 21 (misalnya `C:\Program Files\Java\jdk-21`).
+5. Pastikan **Source/Binary Level** = 21.
+
+Alternatif tanpa menyentuh NetBeans: jalankan build dari terminal dengan `JAVA_HOME` menunjuk JDK 21.
+
+### 12.4 Langkah 3: Memilih Main Class yang Benar
+
+Main class yang benar adalah:
+
+```text
+id.edu.homeschool.Main
+```
+
+Cara memastikannya:
+1. Klik kanan project → **Properties** → tab **Run** (atau **Run → Set Main Class**).
+2. Pilih kelas `Main` pada package `id.edu.homeschool`.
+3. Pastikan **Apply Main Class to** = project (bukan hanya satu file).
+
+Alternatif langsung dari IDE: buka `src/main/java/id/edu/homeschool/Main.java`, letakkan kursor di dalam `main`, lalu tekan **Shift+F6** (Run File).
+
+### 12.5 Langkah 4: Menjalankan Aplikasi
+
+**Cara A — dari NetBeans:**
+Tekan **F6** (Run Project) atau klik tombol **Run Project** (▶) pada toolbar.
+
+**Cara B — dari terminal PowerShell di dalam folder project:**
+
+```powershell
+# Pastikan JAVA_HOME menunjuk JDK 21
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+
+# Build dan jalankan seluruh pengujian (opsional, ± 3 menit)
+.\mvnw.cmd clean test
+
+# Jalankan aplikasi
+.\mvnw.cmd exec:java
+```
+
+> Catatan: `exec-maven-plugin` sudah dikonfigurasi dengan `<mainClass>id.edu.homeschool.Main</mainClass>`, sehingga `exec:java` langsung menjalankan aplikasi.
+
+**Yang diharapkan:** jendela bertuliskan "Personal Homeschooling Learning System" (1360 x 860) terbuka, menampilkan kartu "Selamat datang kembali" di atas latar bergradien.
+
+**Kalau gagal:**
+- `UnsupportedClassVersionError` atau error kompilasi → `JAVA_HOME` masih menunjuk JDK versi lama. Atur ke JDK 21.
+- `Could not resolve dependencies` → jalankan sekali dengan koneksi internet; Maven Wrapper mengunduh Maven dan dependensinya.
+- `Port 8080 in use` atau error jaringan lain → biasanya bukan dari aplikasi ini; aplikasi ini tidak memakai jaringan sama sekali.
+
+### 12.6 Langkah 5: Memperlihatkan Tampilan Aplikasi
+
+Urutan tangkapan layar yang baik untuk presentasi (sesuai urutan file di `target/screenshots/`):
+
+| Urutan | Layar | Apa yang ditunjukkan |
+|---|---|---|
+| 1 | Login + strip akun demo | Autentikasi dan data demo siap pakai |
+| 2 | Dashboard pengajar | Ringkasan dari data tersimpan, bukan angka dummy |
+| 3 | Materi → "Lihat materi" | Materi berisi penjelasan, contoh, latihan, kunci jawaban |
+| 4 | Tugas | Tenggat dan status berwarna |
+| 5 | Evaluasi | Nilai dan persentase |
+| 6 | Laporan progres | Ringkasan naratif + rincian per mata pelajaran |
+| 7 | Undangan + Permintaan siswa | Alur koneksi pengajar–siswa |
+| 8 | Dashboard siswa | Tampilan mode baca |
+
+### 12.7 Langkah 6: Satu Alur Fungsi yang Sudah Diverifikasi
+
+**Alur yang paling aman didemonstrasikan: Tambah tugas → siswa menandai selesai → progres berubah.**
+
+Alasannya dipilih: hanya butuh dua akun, terlihat jelas di layar, dan hasilnya bisa diverifikasi secara visual.
+
+**Persiapan (sebelum demo):**
+1. Pastikan ada data demo (jalankan aplikasi sekali pada komputer yang datanya masih kosong, atau pakai data demo yang sudah ada).
+
+**Langkah demo:**
+
+**Sebagai pengajar** (`rani@demo.test` / `DemoGuru2024!`):
+1. Masuk. Dashboard pengajar tampil dengan kartu statistik terisi.
+2. Pastikan siswa terpilih adalah "Dimas Ardi" pada bar atas.
+3. Sidebar → **Pembelajaran → Tugas**.
+4. Tekan **Tambah**. Isi:
+   - Judul tugas: `Latihan Persamaan Linear (demo UTS)`
+   - Mata pelajaran: `Matematika`
+   - Tenggat: `2026-11-15`
+   - Instruksi: `Kerjakan lima soal persamaan linear pada halaman 12.`
+5. Tekan **Simpan** pada dialog. Dialog ditutup, pesan "Data tersimpan" tampil, dan baris baru langsung terlihat di tabel.
+
+**Sebagai siswa** (`dimas@demo.test` / `DemoSiswa2024!`):
+6. Tekan **Keluar** di kanan atas, lalu masuk sebagai siswa.
+7. Buka **Pembelajaran → Tugas**. Tugas yang baru dibuat **terlihat** di tabel siswa — ini bukti bahwa relasi pengajar–siswa bekerja.
+8. Perhatikan kolom **Status** — tugas baru berstatus "Belum selesai".
+9. Pilih baris tersebut, tekan **Tandai selesai**. Pesan konfirmasi tampil.
+10. Status berubah menjadi **"Selesai"** (hijau).
+
+**Sebagai pengajar** (kembali):
+11. Masuk lagi sebagai pengajar, buka **Laporan progres**.
+12. Kartu "Tugas selesai" bertambah satu, dan angka pada **Ringkasan laporan** ikut berubah.
+
+**Penutupan alur (opsional tapi sangat kuat):**
+13. Tutup aplikasi. Buka lagi, masuk sebagai siswa. Tugas yang tadi ditandai selesai **masih** berstatus "Selesai". Ini membuktikan persistensi data.
+
+### 12.8 Langkah 7: Menjelaskan Konsep OOP dari Kode
+
+Peta file → konsep. Buka file-file ini di IDE saat menjelaskan:
+
+| Konsep | File yang dibuka | Yang ditunjukkan |
+|---|---|---|
+| **Abstraction (abstract class)** | `model/Pengguna.java` | `public abstract class Pengguna` dengan `public abstract String getRoleLabel();` |
+| **Inheritance** | `model/Siswa.java`, `model/Pengajar.java` | `extends Pengguna` + `@Override getRoleLabel()` |
+| **Abstraction (interface)** | `repository/Repository.java` | Empat operasi baca/tulis sebagai kontrak |
+| **Polymorphism (interface)** | `repository/JsonRepository.java` | `implements Repository<T>` |
+| **Polymorphism (interface, UI)** | `ui/AppShell.java` | `if (page instanceof Refreshable refreshable) refreshable.refresh();` |
+| **Polymorphism (abstract method)** | `model/LearningItem.java`, `LearningTask.java`, `LearningGoal.java` | `getStatusLabel()` abstract lalu di-override |
+| **Encapsulation** | `model/Evaluation.java` | `private double score;` + `setScores()` yang menolak nilai di luar rentang |
+| **Encapsulation (data sensitif)** | `model/UserAccount.java` | Tidak ada field/getter kata sandi polos; hash divalidasi regex |
+| **Constructor** | `model/Subject.java`, `model/LearningItem.java` | Constructor chaining `this()` dan validasi melalui setter |
+| **Attribute** | `model/LearningTask.java` | `private String subjectId; private LocalDate dueDate; private boolean completed;` |
+| **Pemisahan lapisan** | `service/LearningWorkspaceService.java` | Service memakai `Repository<T>`, tidak tahu apa-apa tentang JSON |
+| **Injection of dependency** | `Main.java` | Seluruh object disusun di satu tempat dan disuntikkan lewat constructor |
+
+**Kalimat penutup yang efektif:** *"Class apa pun di project ini bisa diuji tanpa Swing sama sekali — itulah bukti bahwa pemisahan tanggung jawab antar-lapisan benar-benar berjalan."*
+
+### 12.9 Langkah 8: Menjelaskan Fitur yang Masih Direncanakan
+
+Sampaikan secara jujur, karena ini menunjukkan kedewasaan:
+
+> *"Prototype ini sudah berfungsi penuh untuk alur inti: autentikasi, koneksi pengajar–siswa, pengelolaan data belajar, dan laporan progres. Yang belum ada adalah lapisan tambahan — seperti basis data SQL terpusat, verifikasi identitas pengajar oleh administrator, lampiran berkas pada materi, ekspor laporan, dan pengingat tenggat. Semua itu ada di rencana tahap UAS, dan saya bisa menjelaskan urutannya. Satu hal yang saya temukan saat verifikasi adalah bug kecil pada dekorasi latar; saya sudah mengisolasi penyebabnya."*
+
+Yang boleh ditampilkan sebagai bukti rencana: tabel status pada Bab 11 (kolom "Kekurangan" dan "Langkah Berikutnya") dan daftar tahap pada Bab 13.
+
+### 12.10 Checklist Sebelum Demo
+
+| # | Pemeriksaan | Cara |
+|---|---|---|
+| 1 | JDK 21 aktif | `java -version` → `21.x` |
+| 2 | Build lulus | `.\mvnw.cmd clean test` -> BUILD SUCCESS, 67 test |
+| 3 | Aplikasi terbuka | `.\mvnw.cmd exec:java` |
+| 4 | Data demo tersedia | Strip "Akun demo siap pakai" terlihat di layar login |
+| 5 | Akun siap | `rani@demo.test` / `DemoGuru2024!` dan `dimas@demo.test` / `DemoSiswa2024!` |
+| 6 | Penyimpanan tidak penuh | Folder `~/.homeschooling-learning-system/data/` tidak sedang dikunci |
+| 7 | Screenshot siap | `target/screenshots/` berisi 22 PNG (opsional untuk lampiran) |
+| 8 | Terminal bersih | Tutup aplikasi sebelum build agar berkas `target/` tidak terkunci |
+
+> **Masalah yang pernah ditemukan saat verifikasi:** `mvn clean` gagal dengan pesan *"Failed to delete … target\app-run.out"* bila aplikasi masih berjalan atau file sedang dikunci. **Tutup aplikasi dan hentikan proses `java` sebelum menjalankan `clean`.**
+
+---
+## BAB 13 — Rencana Pengembangan dari UTS sampai UAS
+
+Rencana berikut disusun berdasarkan kondisi prototype **saat ini** (lihat Bab 11), bukan dari daftar keinginan umum. Setiap tahap punya tujuan, pekerjaan konkret, hasil yang diharapkan, dan **kriteria selesai yang dapat diuji**.
+
+Tidak ada tanggal yang dicantumkan, karena kurikulum dan beban UAS tiap semester berbeda. Urutan tahap yang penting, bukan waktunya.
+
+---
+
+### Tahap 1 — Menstabilkan Prototype dan Navigasi
+
+**Tujuan.** Pastikan aplikasi berjalan tanpa galat dari awal hingga akhir dan tidak ada lagi cacat rendering, sehingga seluruh tahap berikutnya dibangun di atas pijakan yang stabil.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Menelaah ulang dekorasi latar agar seluruh efek "bloom" benar-benar tampil, dan menambahkan pengujian tampilan yang memanggil `Glass.paintCanvas()` sehingga regresi seperti yang ditemukan pada Bab 11.4 tidak terulang.
+2. Laporkan dan perbaiki galat `stderr` lain yang muncul saat aplikasi dijalankan.
+3. Pastikan `mvnw.cmd clean test` selalu lulus dari kondisi mesin yang bersih (tanpa `target/`).
+4. Rapikan halaman Undangan, Permintaan siswa, dan Koneksi pengajar agar ikut bereaksi terhadap perubahan cakupan (halaman-halaman ini belum mendaftarkan listener `Workspace.onChange`).
+5. Tutup kode mati: `Theme.GLASS_EDGE`, `Theme.SURFACE`, `Theme.SIDEBAR`, `Glass.paintHeaderBand()`, `Ui.paintActiveMarker()`.
+
+**Hasil yang diharapkan.** Aplikasi berjalan tanpa stack trace; seluruh 14 menu dapat dibuka dan ditutup tanpa galat.
+
+**Kriteria selesai.**
+- `mvnw.cmd clean test` → BUILD SUCCESS.
+- Menjalankan aplikasi 10 menit sambil membuka semua menu: `stderr` kosong.
+- Tidak ada lagi simbol yang tidak terpakai di project.
+
+---
+
+### Tahap 2 — Melengkapi Model, Service, dan Operasi CRUD
+
+**Tujuan.** Menutup celah CRUD yang masih ada dan memastikan seluruh model memiliki operasi(create/read/update/delete) yang lengkap.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Tambahkan operasi **ubah (update)** yang eksplisit untuk `Subject`, `LearningMaterial`, `StudySession`, `LearningTask`, `LearningGoal`, dan `Evaluation` sebagai method terpisah (misalnya `updateSubject(...)`) agar intent-nya jelas — saat ini update dilakukan lewat `save()` dengan objek yang sudah diubah.
+2. Tambahkan `findBySubject(...)`, `findByStudent(...)`, `findByDateRange(...)` pada `Repository<T>` atau sebagai method turunan di service, agar penyaringan tidak selalu memuat seluruh daftar.
+3. Tambahkan field `expertise` dan `qualifications` ke `UserAccount` beserta form profilnya.
+4. Tambahkan `AccountStatus.DISABLED` yang bisa diaktifkan oleh pengajar (dengan alasan).
+5. Tambahkan validasi nama mata pelajaran unik per cakupan siswa.
+
+**Hasil yang diharapkan.** Setiap jenis data punya operasi CRUD yang lengkap dan terdokumentasi; profil pengajar dapat diedit.
+
+**Kriteria selesai.**
+- Untuk setiap jenis data: ada test yang membuat, membaca, mengubah, dan menghapus, lalu memverifikasi efeknya pada tabel.
+- `UserAccount` memuat bidang keahlian dan kualifikasi yang dapat diedit dari halaman Profil.
+- Jumlah test naik minimal 15 test baru, semuanya lulus.
+
+---
+
+### Tahap 3 — Menyelesaikan Modul Jadwal, Materi, Tugas, dan Evaluasi
+
+**Tujuan.** Membuat modul-modul belajar benar-benar lengkap secara fungsional, bukan sekadar bisa menambah dan menghapus baris.
+
+**Pekerjaan yang perlu dilakukan.**
+1. **Jadwal:** tambahkan pola berulang mingguan; tambahkan deteksi bentrok (dua sesi pada tanggal dan jam yang sama untuk siswa yang sama).
+2. **Materi:** tambahkan manajemen lampiran berkas (simpan di folder `attachments/` di direktori data, sisipkan path pada `LearningMaterial.location`); tambahkan pratinjau gambar.
+3. **Tugas:** tambahkan jenis tugas (tidak wajib); tambahkan lampiran instruksi berupa gambar; tambahkan catatan private pengajar per tugas yang tidak terlihat siswa.
+4. **Evaluasi:** tambahkan jenis penilaian (ulangan, quiz, tugas, ujian) dan bobot; tambahkan skala nilai huruf sebagai turunan persentase.
+5. **Target:** tambahkan indikator capaian dan kurva kemajuan.
+
+**Hasil yang diharapkan.** Pengajar dapat menjalankan siklus belajar nyata: merencanakan, menyiapkan bahan, memberikan tugas, menilai, lalu mengukur capaian.
+
+**Kriteria selesai.**
+- Jadwal berulang dapat dibuat untuk beberapa hari dalam seminggu dan terbaca utuh di tabel.
+- Lampiran berkas materi dapat diunggah, disimpan, dan diunduh kembali.
+- Tugas dan evaluasi memiliki jenis penilaian yang tampil di tabel dan dihitung terpisah pada laporan.
+- Tidak ada alur CRUD yang masih memakai data dummy.
+
+---
+
+### Tahap 4 — Melengkapi Penyimpanan dan Relasi Data
+
+**Tujuan.** Mengganti penyimpanan JSON-files dengan penyimpanan yang lebih tahan perubahan dan mudah dikembangkan, **tanpa** mengubah kode service maupun UI.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Buat `JdbcRepository<T>` yang mengimplementasikan `Repository<T>` yang sama.
+2. Buat skema SQL: tabel `accounts`, `invitations`, `connection_requests`, `connections`, `learning_access_grants`, `subjects`, `materials`, `study_sessions`, `tasks`, `goals`, `evaluations`.
+3. Buat *foreign key* dan batasan `UNIQUE` di level basis data, termasuk batasan yang mencegah grant ganda.
+4. Sediakan **mekanisme pemilihan backend**: konfigurasi `application.properties` menentukan apakah memakai JSON atau SQL, sehingga `ApplicationRepositories` dapat mengembalikan implementasi yang sesuai.
+5. Tambahkan skema migrasi (Flyway atau Liquibase).
+6. Sediakan alat migrasi data JSON lama ke SQL.
+
+**Hasil yang diharapkan.** Data tersimpan di basis data dengan integritas referensial yang dijaga mesin.
+
+**Kriteria selesai.**
+- Service dan UI **tidak berubah satu baris pun** saat berpindah ke SQL — ini adalah bukti bahwa abstraksi `Repository<T>` benar-benar bekerja.
+- Uji otomatis tetap lulus, baik dengan backend JSON maupun backend SQL.
+- Berganti backend hanya melalui konfigurasi.
+
+---
+
+### Tahap 5 — Menyelesaikan Autentikasi dan Pembatasan Akses
+
+**Tujuan.** Memperketat keamanan dan menambah fitur akun yang realistis dibutuhkan.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Tambahkan peran `ADMIN` pada `AccountRole`, dengan halaman khusus untuk:
+   - menyetujui atau menolak pendaftaran pengajar;
+   - menonaktifkan akun;
+   - melihat seluruh pengguna dan relasinya.
+2. Implementasikan **reset kata sandi**: token reset sekali pakai berumur terbatas, dikirim lewat kanal yang disepakati.
+3. Tambahkan **pembatasan percobaan login**: setelah N kali gagal, akun dikunci sementara dengan pesan yang informatif.
+4. Tambahkan masa berlaku token sesi dan mekanisme perpanjangan.
+5. Tambahkan **verifikasi email** saat registrasi.
+6. Tambahkan catatan audit sederhana (login berhasil/gagal, perubahan data) pada berkas log terpisah.
+
+**Hasil yang diharapkan.** Pendaftaran pengajar tidak lagi terbuka bebas, dan akun lebih aman terhadap percobaan tebak.
+
+**Kriteria selesai.**
+- Pendaftaran pengajar baru berstatus "menunggu persetujuan" sampai disetujui admin.
+- Akun terkunci setelah percobaan login gagal berulang, dengan pesan yang jelas.
+- Setiap test keamanan memiliki test yang membuktikan penolakannya.
+
+---
+
+### Tahap 6 — Memperbaiki UI dan Validasi
+
+**Tujuan.** Meningkatkan kegunaan dan kejelasan tampilan serta validasi input yang lebih baik.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Tambahkan **tema gelap** (token warna kedua pada `Theme`) dan sakelar tema pada halaman Pengaturan.
+2. Tambahkan **pengaturan tampilan**: ukuran font (kecil/normal/besar) dan apakah tabel menampilkan kolom tertentu.
+3. Perbaiki validasi input: saat ini tanggal, waktu, dan angka baru divalidasi saat menyimpan. Tambahkan validasi langsung saat mengetik dengan pesan di bawah field.
+4. Tambahkan shortcut keyboard (Ctrl+S menyimpan, Ctrl+F mencari, F1 bantuan).
+5. Tambahkan tooltip pada semua tombol ikon dan teks penanda isian wajib.
+6. Perbaiki konsistensi nama: "Akun demo" dan "Data demo" muncul di beberapa halaman dengan gaya berbeda.
+7. Tambahkan **halaman Pengaturan** terpisah (saat ini pengaturan masih berada di halaman Profil).
+
+**Hasil yang diharapkan.** Aplikasi lebih mudah dipelajari oleh pengguna baru dan lebih nyaman untuk pengguna lama.
+
+**Kriteria selesai.**
+- Seluruh halaman dapat diakses dengan keyboard saja.
+- Tidak ada lagi input yang gagal tanpa penjelasan yang jelas.
+- Tema gelap dan ukuran font tersimpan di preferensi pengguna.
+
+---
+
+### Tahap 7 — Pengujian Integrasi dan Perbaikan Bug
+
+**Tujuan.** Meningkatkan keyakinan bahwa aplikasi benar-benar bekerja, bukan hanya terlihat benar.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Tambahkan pengujian **JaCoCo** dan target cakupan kode minimal 80%.
+2. Tambahkan pengujian **UI berbasis EventQueue** yang benar-benar menekan tombol dan memeriksa isi tabel (pola yang sudah dipakai `AuthScreenTest`).
+3. Tambahkan pengujian **ujung ke ujung** untuk alur lengkap: daftar → login → undangan → permintaan → persetujuan → buat tugas → tandai selesai → verifikasi laporan progres.
+4. Tambahkan pengujian **beban ringan**: 1.000 tugas, 100 materi, 50 siswa — pastikan waktu muat masih masuk akal.
+5. Tambahkan pengujian **kompatibilitas**: berkas JSON versi lama dan berkas rusak ditangani dengan baik.
+6. Perbaiki semua bug yang ditemukan dan tambahkan test regresi untuk masing-masing.
+
+**Hasil yang diharapkan.** Angka cakupan kode yang terukur, dan setiap bug yang ditemukan memiliki test yang mencegah kemunculan kembali.
+
+**Kriteria selesai.**
+- Cakupan kode ≥ 80% pada paket `model`, `repository`, dan `service`.
+- Tidak ada test yang bersifat "flaky" (saling bergantung urutan eksekusi).
+- 5 alur utama aplikasi tertutup oleh test ujung ke ujung.
+
+---
+
+### Tahap 8 — Dokumentasi dan Persiapan Demonstrasi UAS
+
+**Tujuan.** Menyiapkan berkas yang dinilai dan demo yang berjalan mulus.
+
+**Pekerjaan yang perlu dilakukan.**
+1. Perbarui `README.md`: koreksi angka test dan tangkapan layar, tambahkan bagian arsitektur, dan dokumentasikan cara menjalankan.
+2. Perbarui `UTS-CLASS-GUIDE.md` menjadi panduan presentasi UAS.
+3. Tulis dokumentasi pengguna (panduan pengguna) yang terpisah dari dokumentasi teknis.
+4. Siapkan skrip demo yang dapat diulang (data demo yang sudah disiapkan, urutan langkah, dan tangkapan layar baru).
+5. Tulis laporan proyek berisi: latar belakang, rancangan, hasil implementasi, pengujian, dan refleksi.
+6. Lakukan **uji coba demo** bersih: mulai dari folder tanpa data, jalankan build, jalankan aplikasi, dan catat setiap langkah.
+
+**Hasil yang diharapkan.** Repositori yang rapi, dokumentasi yang akurat, dan demo yang berjalan tanpa kejutan.
+
+**Kriteria selesai.**
+- README cocok dengan keadaan project (tidak ada angka yang basi).
+- Demo dapat diulang oleh anggota lain tanpa bantuan.
+- Semua dokumen memakai angka hasil verifikasi terbaru.
+
+---
+
+### Ringkasan Tahapan
+
+| Tahap | Fokus | Hasil Utama | Kriteria Selesai Singkat |
+|---|---|---|---|
+| 1 | Stabilisasi | Tidak ada galat; kode mati dibersihkan | `stderr` kosong; build lulus |
+| 2 | Model & CRUD | CRUD lengkap di semua jenis data | Test CRUD per jenis data lulus |
+| 3 | Modul belajar | Modul lengkap secara fungsional | Alur belajar lengkap dapat dijalankan |
+| 4 | Penyimpanan | Backend SQL dengan FK | Service/UI tidak berubah saat pindah backend |
+| 5 | Keamanan | Admin, reset sandi, rate limit | Pendaftaran pengajar perlu persetujuan |
+| 6 | UI & validasi | Tema gelap, pengaturan, validasi real-time | Seluruh halaman dapat diakses via keyboard |
+| 7 | Pengujian | Cakupan ≥ 80%, test ujung ke ujung | Tidak ada test flaky |
+| 8 | Dokumentasi | README akurat, demo siap | Demo dapat diulang sendiri |
+
+---
+## BAB 14 — Target Hasil Akhir UAS
+
+Bab ini menjelaskan gambaran aplikasi yang ingin dicapai pada akhir semester. Yang ditulis di sini adalah **target yang realistis** - dibatasi oleh apa yang sudah ada, bukan daftar harapan.
+
+### 14.1 Target Utama (Wajib Tercapai)
+
+| No. | Target | Bagaimana Tercapainya Terlihat | Fondasi yang Sudah Ada |
+|---|---|---|---|
+| U1 | Aplikasi Java Swing yang dapat dijalankan dari NetBeans | `mvnw.cmd clean test` BUILD SUCCESS dan `mvnw.cmd exec:java` membuka jendela | Sudah ada, terbukti |
+| U2 | Autentikasi dengan dua peran yang berjalan penuh | Login, registrasi, logout, ubah profil, ubah kata sandi, akun nonaktif ditolak | Sudah ada, terbukti |
+| U3 | Siklus koneksi pengajar–siswa yang lengkap | Undangan → permintaan → persetujuan → relasi aktif → koneksi dapat diakhiri | Sudah ada, terbukti |
+| U4 | Enam modul belajar dengan CRUD lengkap | Mata pelajaran, materi, jadwal, tugas, target, evaluasi — tambah, ubah, hapus, baca | Sudah ada, terbukti |
+| U5 | Data tersimpan dengan benar dan bertahan | Berkas JSON berisi data valid; data tetap ada setelah aplikasi ditutup | Sudah ada, terbukti |
+| U6 | Navigasi yang konsisten | Sidebar dengan section, semua halaman dapat dibuka, tidak ada halaman yang Error | Sudah ada, terbukti |
+| U7 | Pemisahan hak akses yang terbukti | Siswa A tidak dapat membaca data siswa B; pengajar tanpa koneksi ditolak | Sudah ada, terbukti |
+| U8 | Laporan progres dari data aktual | Angka dan narasi yang dihitung dari repository, bukan hard-coded | Sudah ada, terbukti |
+| U9 | Pengujian otomatis yang bersih | 80+ test, semuanya lulus, cakupan ≥ 80% pada model/repository/service | Tahap 7 |
+| U10 | Dokumentasi yang akurat | README, panduan presentasi, dokumentasi pengguna, laporan proyek | Tahap 8 |
+| U11 | Penyimpanan yang dapat diganti ke SQL | Backend JDBC dengan pilihan berbasis konfigurasi, tanpa mengubah service/UI | Tahap 4 |
+| U12 | Keamanan akun yang memadai | Peran admin, verifikasi pengajar, reset kata sandi, rate limit login | Tahap 5 |
+
+### 14.2 Target Pendukung (Sangat Diharapkan Dilakukan)
+
+| No. | Target | Keterbatasan yang perlu diterima |
+|---|---|---|
+| S1 | Laporan dengan filter periode dan ekspor PDF | Butuh pustaka ekspor atau penyusun PDF sederhana |
+| S2 | Lampiran berkas pada materi dan tugas | Manage folder lampiran di luar JSON |
+| S3 | Jadwal berulang mingguan dengan deteksi bentrok | Butuh representasi aturan berulang, bukan sekadar tanggal |
+| S4 | Tema gelap dan pengaturan tampilan | Butuh token warna kedua; tidak memerlukan biaya besar |
+| S5 | Jenis penilaian dan bobot penilaian | Butuh perubahan perhitungan rata-rata pada laporan |
+| S6 | Pengingat tenggat dalam aplikasi | Butuh timer pada EDT atau ScheduledExecutor |
+| S7 | Import data siswa massal (CSV) | Butuh parser CSV dan dialog pemetaan kolom |
+| S8 | Sinkronisasi antar-perangkat | Butuh server dan otentikasi tambahan |
+
+### 14.3 Fitur yang Tidak Akan Dikerjakan dalam Semester Ini
+
+Hal-hal berikut **sengaja tidak** menjadi target, dan sebaiknya disebut terbuka agar ekspektasi realistis:
+
+| Fitur | Alasan |
+|---|---|
+| Aplikasi mobile (Android/iOS) | Butuh tim dan waktu yang jauh melebihi satu semester mata kuliah. |
+| Integrasi kalender (Google Calendar) | Butuh OAuth dan dependensi jaringan yang bertentangan dengan sifat offline aplikasi. |
+| Chat atau komunikasi langsung antar pengajar dan siswa | Berbeda lingkup; bukan masalah yang diselesaikan oleh aplikasi ini. |
+| Video conference | Jauh di luar lingkup. |
+| Multi-bahasa antarmuka | Seluruh antarmuka saat ini berbahasa Indonesia; menambah bahasa berarti menambah rangkaian detail yang besar. |
+| Sinkronisasi real-time antar-pengguna | Memerlukan arsitektur server yang sepenuhnya berbeda. |
+
+### 14.4 Gambaran Arsitektur Target
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  UI  (Java Swing)                                          │
+│  MainFrame → AuthScreen | AppShell → 14 halaman            │
+│  DataTable<T>  ·  FormDialog  ·  DetailDialog  ·  Dialogs   │
+└───────────────────────────┬─────────────────────────────────┘
+                            │  memanggil method service
+┌───────────────────────────▼─────────────────────────────────┐
+│  SERVICE  (aturan bisnis)                                   │
+│  AuthService  ·  ConnectionService                          │
+│  LearningWorkspaceService  ·  LearningService  ·  Session   │
+└───────────────────────────┬─────────────────────────────────┘
+                            │  memakai kontrak Repository<T>
+┌───────────────────────────▼─────────────────────────────────┐
+│  REPOSITORY  (abstraksi penyimpanan)                        │
+│  Repository<T>  (interface)                                 │
+│    ├── JsonRepository<T>     ← aktif sekarang                 │
+│    └── JdbcRepository<T>     ← target tahap 4                │
+└───────────────────────────┬─────────────────────────────────┘
+                            │  serialize / deserialize
+┌───────────────────────────▼─────────────────────────────────┐
+│  MODEL  (data + validasi)                                   │
+│  22 class: entitas, enum status, abstract base              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Perubahan yang dibutuhkan untuk mencapai target ini **terpusat pada lapisan repository**. Semua lapisan di atasnya dapat tetap utuh — itulah tujuan dari abstraksi `Repository<T>`.
+
+### 14.5 Ukuran Keberhasilan
+
+| Ukuran | Kondisi sekarang | Target UAS |
+|---|---|---|
+| Jumlah test otomatis | 67 | 80+ |
+| Cakupan kode (model/repository/service) | Belum diukur | ≥ 80% |
+| Jumlah cacat terbuka yang diketahui | 0 | 0 |
+| Modul belajar yang berfungsi penuh | 6 dari 6 | 6 dari 6 |
+| Halaman UI yang dapat dibuka | 14 dari 14 | 14 dari 14 |
+| Backend penyimpanan | JSON | JSON **dan** SQL (dapat dipilih) |
+| Peran pengguna | 2 | 3 (tambah admin) |
+| Dokumentasi | README + panduan class | README + panduan class + panduan pengguna + laporan |
+
+---
+## BAB 15 — Kelebihan, Keterbatasan, dan Pengembangan Lanjutan
+
+### 15.1 Kelebihan Pendekatan yang Dipilih
+
+| No. | Kelebihan | Bukti |
+|---|---|---|
+| 1 | **Pemecahan masalah yang jelas.** Satu aplikasi menyelesaikan enam masalah (jadwal, materi, tugas, target, evaluasi, progres) di satu tempat. | Enam modul berbagi komponen generik yang sama. |
+| 2 | **Aturan akses ditegakkan di lapisan bisnis, bukan di UI.** Menu disembunyikan, tetapi data siswa tetap tidak bisa diakses bila service dipanggil langsung. | `LearningWorkspaceFlowTest.studentCannotReadAnotherStudentAndCannotWriteAnything()` melempar `SecurityException`. |
+| 3 | **Abstraksi benar-benar dipakai, bukan sekadar formalitas.** `Repository<T>` memungkinkan backend diganti tanpa menyentuh service. | Service bertipe `Repository<UserAccount>`, bukan `JsonRepository<UserAccount>`. |
+| 4 | **Komponen generik mengurangi duplikasi.** Satu `DataTable<T>` melayani sembilan tipe data; satu `LearningTablePage<T>` melayani enam modul. | `LearningTablePage` di-*override* oleh 6 subclass dengan total ± 60 baris per subclass. |
+| 5 | **Pengujian otomatis yang bermakna.** 67 test, termasuk pengujian yang benar-benar menekan tombol Swing. | `AuthScreenTest` mencari tombol "Masuk" di pohon komponen lalu `doClick()`. |
+| 6 | **Data contoh yang aman.** Data demo tidak menimpa data pengguna dan tidak muncul dua kali. | `DemoDataServiceTest.seedingIsNotRepeatedAndUserDataIsNotOverwritten()`. |
+| 7 | **Penulisan berkas yang aman.** Penulisan atomik mencegah berkas setengah tertulis. | `JsonRepository.write()` memakai `.tmp` + `ATOMIC_MOVE` dengan fallback. |
+| 8 | **Keamanan kata sandi yang benar.** PBKDF2-HMAC-SHA256, 210.000 iterasi, salt acak, dan tidak ada plaintext. | `AuthFlowTest.passwordIsStoredAsHashAndNeverInPlainText()`. |
+| 9 | **Antarmuka konsisten dan rapi.** Semua token dari satu sumber; semua pesan dalam bahasa Indonesia yang konstruktif. | Paket `ui.design` dengan 18 class yang dapat dipakai ulang. |
+| 10 | **Aplikasi langsung bisa dicoba.** Data demo membuat tidak ada halaman kosong saat pertama dibuka. | 22 tangkapan layar berhasil dihasilkan. |
+| 11 | **Dokumentasi teknis tersedia.** README, panduan class, dan dokumen ini. | Berkas di root project. |
+
+### 15.2 Keterbatasan Prototype
+
+**Keterbatasan fungsional:**
+
+| Keterbatasan | Dampak |
+|---|---|
+| Pendaftaran pengajar terbuka tanpa verifikasi | Siapa pun bisa membuat akun pengajar. Prototype hanya, tidak untuk produksi. |
+| Data hanya untuk satu siswa pada satu waktu di halaman belajar | Pengajar dengan banyak siswa harus berganti cakupan terus-menerus. |
+| Tidak ada jenis/bobot penilaian | Semua evaluasi diperlakukan sama dalam rata-rata. |
+| Tidak ada lampiran berkas | Materi dan tugas hanya dapat membawa teks dan URL. |
+| Tidak ada ekspor laporan | Laporan hanya dapat dibaca di layar atau dicatat manual. |
+| Tidak ada pencarian di dalam isi materi | Siswa harus membuka tiap materi satu per satu. |
+| Jadwal belum berulang | Jadwal mingguan harus dibuat satu per satu. |
+| Tidak ada pengaturan tampilan | Tema dan ukuran font tetap. |
+| Arsip data lama tidak dapat dimigrasi | Data pra-akun tetap hanya-baca selamanya. |
+
+**Keterbatasan teknis:**
+
+| Keterbatasan | Dampak |
+|---|---|
+| Penyimpanan JSON tanpa transaksi | Operasi lintas berkas bisa separuh jadi bila aplikasi mati mendadak. |
+| Tidak ada enkripsi berkas | Data pribadi dan nilai siswa dapat dibaca siapa pun yang punya akses folder. |
+| Sesi hilang saat aplikasi ditutup | Pengguna harus masuk ulang setiap kali aplikasi dibuka ulang. |
+| Tidak ada pembatasan percobaan login | Rentan terhadap percobaan tebak kata sandi. |
+| Single process | Dua instance aplikasi pada direktori yang sama bisa saling menimpa berkas. |
+| Penulisan ulang seluruh berkas pada setiap perubahan | Lambat bila data tumbuh menjadi ribuan baris. |
+| Ukuran ditulis dalam piksel absolut | Belum diuji pada monitor dengan skala DPI berbeda. |
+| Cacat dekorasi latar sudah diperbaiki | Tidak ada cacat terbuka yang diketahui (lihat Bab 11.4). |
+| Kode mati masih tersisa | `Theme.GLASS_EDGE`, `Theme.SURFACE`, `Theme.SIDEBAR`, `Glass.paintHeaderBand()`, `Ui.paintActiveMarker()`. |
+
+**Keterbatasan proses:**
+
+| Keterbatasan | Dampak |
+|---|---|
+| `README.md` masih memuat angka yang belum tepat ("63 test", "21 PNG") | Harus diperbarui pada tahap 8. |
+| Harness tangkapan layar berada di luar build Maven | Tidak dijalankan otomatis oleh `mvn test`. |
+| Belum ada cakupan kode terukur | Belum diketahui berapa persen kode yang benar-benar tersentuh test. |
+| Belum ada CI | Kualitas bergantung pada disiplin build manual. |
+
+### 15.3 Risiko Teknis yang Perlu Diperhatikan
+
+| Risiko | Dampak | Mitigasi |
+|---|---|---|
+| **Penulisan berkas JSON tanpa kunci** | Kerusakan data bila aplikasi mati saat menulis | Sudah ditangani dengan penulisan atomik; dapat ditingkatkan dengan berkas cadangan. |
+| **PBKDF2 210.000 iterasi membuat login lambat** | Login terasa lambat di komputer lambat (sekitar 1–3 detik pada 6 test PBKDF2 yang memakan ± 5 detik) | Naikkan iterasi secara bertahap, atau gunakan login non-PBKDF2 untuk prototipe |
+| **Perubahan skema JSON** | Data lama tidak terbaca | Simpan versi skema di setiap berkas |
+| **UI Swing berada di EDT** | Operasi berat membekukan antarmuka | Semua operasi saat ini ringan; JSON bertumpuk besar perlu dipindah ke worker thread |
+| **Banyaknya listener `Workspace.onChange`** | Risiko memory leak | Listener yang telah diimplementasikan disimpan dalam list; belum ada uji beban |
+| **Dua instance menulis berkas yang sama** | Data saling menimpa | Ditemukan saat verifikasi: `mvn clean` gagal karena berkas terkunci. Perlu file lock. |
+
+### 15.4 Kemungkinan Pengembangan Lanjutan
+
+**Jangka pendek (yang paling masuk akal):**
+1. Membersihkan kode mati dan menambahkan pengujian tampilan yang memanggil jalur lukis dekorasi.
+2. Melengkapi operasi update dan menambah pencarian pada isi materi.
+3. Menambahkan tema gelap dan pengaturan tampilan.
+4. Menambahkan lampiran berkas.
+5. Menambahkan jenis penilaian dan filter periode pada laporan.
+
+**Jangka menengah:**
+6. Backend SQL dengan kunci asing dan transaksi (lewat `Repository<T>`).
+7. Peran administrator dan verifikasi pendaftaran pengajar.
+8. Reset kata sandi dan rate limit login.
+9. Ekspor laporan ke PDF.
+10. Jadwal berulang dengan deteksi bentrok.
+
+**Jangka panjang (di luar satu semester):**
+11. Versi web (Spring Boot + template server-side) memakai ulang seluruh lapisan model, service, dan repository.
+12. Versi mobile.
+13. Sinkronisasi multi-pengguna dengan server terpusat.
+14. Integrasi dengan kurikulum resmi dan modul pembelajaran yang terstandarisasi.
+
+### 15.5 Hal yang Belum Dapat Dipastikan dari Source Code
+
+Hal-hal berikut **tidak** bisa disimpulkan hanya dari membaca kode, dan sebaiknya dijawab sebagai "belum diuji" bila ditanya:
+
+| Pertanyaan | Status |
+|---|---|
+| Bagaimana aplikasi berperilaku dengan 10.000 tugas | Belum diuji |
+| Apakah `ATOMIC_MOVE` bekerja di drive jaringan | Belum diuji |
+| Bagaimana tampilan pada monitor 4K atau skala 150% | Belum diuji |
+| Apakah aplikasi berjalan di Linux/macOS | Belum diuji |
+| Apakah data di direktori bersama bisa dibaca orang lain | Secara teknis ya; belum ada uji keamanan |
+| Seberapa cepat login pada komputer lambat | Belum diukur |
+| Apakah daftar tahun yang begitu panjang masih bisa di-*scroll* | Belum diuji |
+
+---
+## BAB 16 — Kesimpulan
+
+### 16.1 Masalah yang Ingin Diselesaikan
+
+Kegiatan belajar homeschooling tersebar di buku tulis, pesan instan, dan berkas yang tidak tertata. Akibatnya, jadwal sulit dipantau, materi tidak terorganisasi, tugas dan tenggat sulit dilacak, nilai tidak terdokumentasi di satu tempat, progres siswa mustahil dirangkum, dan pengajar yang menangani beberapa siswa tidak punya cara terstruktur untuk memisahkan data masing-masing.
+
+### 16.2 Solusi yang Diusulkan
+
+**Personal Homeschooling Learning System** — aplikasi desktop berbasis Java Swing yang menyatukan seluruh data belajar dalam satu penyimpanan lokal, memastikan setiap record belajar memiliki pemilik yang jelas melalui mekanisme *ownership grant*, dan hanya menampilkan data yang memang berhak dilihat oleh akun yang sedang masuk.
+
+### 16.3 Manfaat bagi Pengajar dan Siswa
+
+| Bagi Pengajar | Bagi Siswa |
+|---|---|
+| Satu tempat untuk mata pelajaran, materi, jadwal, tugas, target, dan evaluasi | Satu tempat untuk seluruh informasi belajar |
+| Rekap progres otomatis: tugas selesai, tugas terlambat, capaian target, rata-rata nilai | Tugas yang jelas beserta tenggat dan instruksinya |
+| Kontrol penuh atas siapa yang boleh melihat data siswanya melalui kode undangan dan persetujuan | Materi lengkap dengan tujuan, penjelasan, contoh, dan latihan |
+| Umpan balik tertulis yang tersimpan bersama nilai | Hanya boleh menandai tugas miliknya sendiri, tanpa bisa mengubah isi tugas |
+| Arsip data lama tetap dapat dibaca | Melihat daftar pengajar yang terhubung dan progresnya sendiri |
+
+### 16.4 Penerapan OOP
+
+| Konsep | Wujud dalam kode |
+|---|---|
+| **Class** | 80 class di 5 package (`model`, `repository`, `service`, `ui`, `ui.design`) |
+| **Object** | Instans model seperti `new Subject("Matematika", "Aljabar")` dan `new LearningTask(...)`, serta instans service seperti `new AuthService(...)` |
+| **Attribute** | Field `private` seperti `score`, `dueDate`, `passwordHash`, `completed` |
+| **Method** | Lebih dari 500 method; contoh kunci: `getPercentage()`, `getStatusLabel()`, `setScores()`, `progress()`, `requireTeacherForStudent()` |
+| **Constructor** | 80+ constructor; `LearningItem(String title)` memanggil `this()` untuk menjamin ID terisi; constructor Jackson pada `Evaluation` |
+| **Encapsulation** | Field `private` + getter/setter tervalidasi; `UserAccount` tidak menyimpan kata sandi polos |
+| **Inheritance** | `Pengguna` → `Siswa`/`Pengajar`; `LearningItem` → `LearningTask`/`LearningGoal` |
+| **Polymorphism** | Overriding `getRoleLabel()` dan `getStatusLabel()`; interface `Repository<T>` dan `AppShell.Refreshable`; `switch` eksklusif atas enum |
+| **Abstraction** | Abstract class `Pengguna` dan `LearningItem`; interface `Repository<T>`; generics pada `DataTable<T>` dan `LearningTablePage<T>` |
+
+### 16.5 Kondisi Prototype Saat Ini
+
+Prototype **berfungsi dan sudah terverifikasi**, bukan sekadar tampilan.
+
+- **Build:** `mvnw.cmd clean test` → **BUILD SUCCESS** (JDK 21.0.12.1, Maven 3.9.16).
+- **Pengujian:** **67 test pada 16 kelas test, 0 gagal, 0 error, 0 skipped**.
+- **Eksekusi:** aplikasi berjalan nyata; jendela Swing terbuka; direktori data terbentuk dengan **12 berkas JSON** terisi.
+- **Cakupan fitur:** login, registrasi, logout, ubah profil, ubah kata sandi, dashboard, kode undangan, permintaan koneksi, persetujuan/penolakan, pengakhiran koneksi, enam modul belajar dengan CRUD, target belajar, laporan progres, direktori, pencarian dan filter, data demo, arsip data lama.
+- **Tidak ada cacat terbuka yang diketahui.** Satu cacat dekorasi latar sempat ditemukan saat verifikasi (tiga "bloom" radier gagal tergambar karena `Glass.paintBloom()` memberikan nilai di luar rentang fraksi 0..1 ke `RadialGradientPaint`) dan **telah diperbaiki**; verifikasi ulang menunjukkan `stderr` kosong dan seluruh 67 test lulus. Analisis lengkapnya ada pada Bab 11.4.
+- **Yang masih rencana:** basis data SQL terpusat, peran administrator, lampiran berkas, ekspor laporan, pengingat tenggat, tema gelap.
+
+### 16.6 Langkah Pengembangan sampai UAS
+
+Delapan tahap, dirangkum berikut ini:
+
+1. **Menstabilkan** - bersihkan kode mati, tambahkan pengujian tampilan untuk jalur lukis dekorasi, pertahankan jaminan `stderr` kosong.
+2. **Melengkapi model dan CRUD** — operasi update eksplisit, pencarian bersyarat, field profil pengajar.
+3. **Menyelesaikan modul belajar** — jadwal berulang, lampiran materi, jenis penilaian, kurva capaian.
+4. **Melengkapi penyimpanan** — backend SQL dengan kunci asing, lewat `Repository<T>` yang sudah disiapkan.
+5. **Menyelesaikan autentikasi** — peran admin, verifikasi pengajar, reset kata sandi, rate limit.
+6. **Memperbaiki UI** — tema gelap, pengaturan tampilan, validasi real-time, akses keyboard.
+7. **Menguji dan mendokumentasikan** — cakupan ≥ 80%, test ujung ke ujung, README akurat, demo siap.
+
+### 16.7 Penutup
+
+Proyek ini menunjukkan bahwa pemrograman berorientasi objek bukan sekadar teori: abstraksi `Repository<T>` membuat penyimpanan dapat ditukar, polimorfisme `getStatusLabel()` membuat satu tabel melayani dua jenis data, encapsulation membuat data tidak pernah rusak karena validasi, dan pemisahan lapisan membuat seluruh logika bisnis dapat diuji tanpa membuka satu pun jendela.
+
+---
+
+## BAB 17 — Pertanyaan yang Mungkin Diajukan Dosen
+
+> Setiap jawaban di bawah disesuaikan dengan kondisi project **saat ini**. Bila jawabannya "belum ada", jawaban itu jujur dan disertai rencana.
+
+### 17.1 Seputar Technology dan Pilihan Desain
+
+**1. Mengapa memilih Java Swing, bukan JavaFX atau web?**
+Java Swing tersedia langsung di JDK tanpa dependensi tambahan, dan mendukung penggambaran kustom lewat `Graphics2D` sehingga aplikasi bisa membuat gaya visual sendiri. Untuk aplikasi desktop satu-pengguna seperti ini, Swing sudah memadai. JavaFX akan menambah dependensi, sedangkan web menuntut server.
+
+**2. Mengapa memakai Maven?**
+Maven membuat build reproducible: satu `pom.xml` menentukan versi Java, library, dan plugin. Selain itu `mvn test` menjalankan seluruh pengujian otomatis dan menghasilkan laporan. Karena project menyertakan Maven Wrapper, orang tidak perlu memasang Maven secara terpisah — cukup `mvnw.cmd`.
+
+**3. Bagaimana cara menjalankan aplikasinya di NetBeans?**
+**File → Open Project**, pilih folder yang berisi `pom.xml`, atur **Java Platform** ke JDK 21 di **Project Properties → Build → Compile**, lalu tekan **F6**. Main class-nya adalah `id.edu.homeschool.Main`, sudah dikonfigurasi di `exec-maven-plugin`.
+
+**4. Mengapa `mvnw.cmd` dan bukan `mvn`?**
+Karena Maven belum tentu terpasang di setiap komputer. `mvnw.cmd` mengunduh Maven 3.9.16 ke folder lokal pengguna secara otomatis. Pada komputer verifikasi, perintah `mvn` memang tidak tersedia di PATH, jadi wrapper adalah satu-satunya cara yang andal.
+
+**5. Apakah aplikasi ini memakai database?**
+**Tidak.** Tidak ada JDBC, tidak ada SQL, tidak ada driver database. Data disimpan pada berkas JSON di `~/.homeschooling-learning-system/data/`. Alasannya: volume data pada prototipe masih kecil, JSON mudah diperiksa saat demo, dan tidak menambah beban setup. Yang penting, **lapisan repository sudah dipisah lewat interface `Repository<T>`**, sehingga mengganti ke SQL pada tahap UAS tidak memerlukan perubahan pada service maupun UI.
+
+### 17.2 Seputar OOP
+
+**6. Apa perbedaan class dan object?**
+Class adalah cetakan (blueprint); object adalah instans nyata dari cetakan itu. `Subject` adalah class — ia hanya menjelaskan bahwa setiap mata pelajaran punya `id`, `name`, dan `description`. Object-nya adalah satu mata pelajaran tertentu, misalnya `new Subject("Matematika", "Aljabar")`. Satu class bisa menghasilkan banyak object dengan nilai berbeda.
+
+**7. Apa kegunaan constructor?**
+Constructor menginisialisasi object sejak dibuat, sehingga object tidak pernah berada dalam keadaan tidak valid. Contoh: `new Evaluation("Matematika", LocalDate.now(), 85, 100, "Baik")` memanggil setter tervalidasi di dalam constructor. Bila nilainya di luar rentang, constructor langsung melempar exception dan object tidak pernah terbentuk. Ada juga constructor chaining: `LearningItem(String title)` memanggil `this()` lebih dulu supaya `id` selalu terisi sebelum data lain diperiksa.
+
+**8. Apa itu encapsulation, dan bagaimana diterapkan di project ini?**
+Encapsulation berarti menyembunyikan detail internal object dan hanya membuka yang diperlukan. Di sini: seluruh field model ditulis `private`, diakses lewat getter/setter, dan setter melakukan validasi. Contoh paling jelas adalah `Evaluation.setScores()` yang menolak nilai negatif, nilai maksimum nol, dan nilai yang melebihi maksimum. Contoh lain: `UserAccount` **tidak punya** field maupun getter kata sandi polos. Dampaknya, data tidak bisa rusak karena pengetikan yang ceroboh, dan seluruh aturan validasi hanya ada di satu tempat.
+
+**9. Apakah project ini memakai inheritance?**
+**Ya, dan dipakai dengan sengaja.** `Pengguna` adalah abstract class yang menyimpan identitas dan kontak; `Siswa` dan `Pengajar` mewarisinya dan hanya menambah data khusus mereka. `LearningItem` abstract, diwarisi `LearningTask` dan `LearningGoal` yang sama-sama punya `id` dan `title` tetapi status berbeda. Warisan dipakai secara dangkal — hanya dua hierarchy — supaya model mudah dipahami.
+
+**10. Bagaimana polymorphism diterapkan?**
+Empat bentuknya ada. **Overriding**: `getRoleLabel()` di `Pengguna` di-override oleh `Siswa` dan `Pengajar`; `getStatusLabel()` di `LearningItem` di-override oleh `LearningTask` dan `LearningGoal`. **Interface**: `Repository<T>` diimplementasikan `JsonRepository<T>`, dan `AppShell.Refreshable` diimplementasikan semua halaman sehingga shell bisa memuat ulang halaman tanpa tahu tipe konkretnya. **Enum dengan `switch` eksklusif**: `switch (status)` pada `InvitationStatus` dan `ConnectionRequestStatus` mencakup semua nilai, sehingga kalau enum ditambah, build akan gagal sampai semua kasus ditangani. **Record** (`UserSession`, `ProgressReport`, dan lainnya) untuk data pembawa yang immutable.
+
+**11. Apa itu abstraction dan apa manfaatnya?**
+Abstraction menyembunyikan detail implementasi. Di sini bentuknya: abstract class `Pengguna` dan `LearningItem`; interface `Repository<T>` dan `AppShell.Refreshable`; dan generics pada `DataTable<T>` yang menerima `Supplier<List<T>>` serta `Function<T, Object[]>`, sehingga tabel tidak perlu tahu asal datanya. Manfaatnya konkret: `DataTable<T>` melayani sembilan tipe data berbeda dengan satu komponen, dan `LearningTablePage<T>` melayani enam modul CRUD dengan satu implementasi — sehingga perbaikan cukup dilakukan di satu tempat.
+
+**12. Bagaimana struktur class-nya, dan bagaimana bagian-bagiannya saling berinteraksi?**
+Arsitekturnya berlapis: **Model** (data + validasi) → **Repository** (penyimpanan, lewat interface `Repository<T>`) → **Service** (aturan bisnis) → **UI** (tampilan). UI tidak pernah memanggil repository secara langsung; ia selalu lewat service. Itu sebabnya aturan akses tidak bisa dilewati. Seluruh dependensi disuntikkan lewat constructor di `Main.main()`, yang menjadi satu-satunya tempat yang tahu semua class.
+
+**13. Mengapa memakai `record` untuk sebagian class?**
+Karena `UserSession`, `AccountSummary`, `ProgressReport`, `PersonSummary`, dan `ActivityEntry` hanya berisi data tanpa perilaku. `record` memberi constructor, getter, `equals()`, `hashCode()`, dan `toString()` yang benar secara otomatis, serta objeknya immutable. Pada `UserSession`, `toString()` di-override supaya token sesi tidak bocor saat dicetak — ditulis sebagai `token=REDACTED`.
+
+### 17.3 Seputar Fungsi dan Keamanan
+
+**14. Bagaimana data disimpan, dan apakah bertahan setelah aplikasi ditutup?**
+Data disimpan pada berkas JSON di `<user.home>/.homeschooling-learning-system/data/`, satu berkas per jenis data. Penulisan dilakukan secara atomik: tulis dulu ke berkas `.tmp`, lalu `ATOMIC_MOVE` ke nama akhir (dengan fallback bila tidak didukung). **Ya, data bertahan** — ini dibuktikan oleh `LearningWorkspaceFlowTest.recordsSurviveApplicationRestart()` dan `AuthFlowTest.registerLoginLogoutWorksAndAccountSurvivesRestart()`, serta saya verifikasi langsung saat menyusun dokumen ini: aplikasi dijalankan, 12 berkas terbentuk, lalu masih utuh setelah aplikasi ditutup. Yang **tidak** bertahan adalah sesi login, karena token hanya disimpan di memori.
+
+**15. Bagaimana cara membedakan hak akses pengajar dan siswa?**
+Lewat peran akun (`AccountRole.PENGAJAR` atau `SISWA`) yang diambil dari token sesi. Setiap service memanggil `require(token, role)` dan melempar `SecurityException` bila perannya tidak cocok. Selain itu, pengajar hanya boleh menulis data untuk siswa yang memiliki relasi `ACTIVE` dengannya, dan setiap record belajar harus punya *ownership grant* yang mencatat pasangan pengajar–siswa pemilik. Aturan ini ditegakkan di service, sehingga tetap berlaku walau UI-nya dimodifikasi.
+
+**16. Bagaimana mencegah siswa melihat data siswa lain?**
+Dengan tiga lapis: (1) `Workspace` mengunci `studentId` siswa ke akunnya sendiri; (2) `LearningWorkspaceService.list()` menolak bila `studentId` yang diminta bukan milik akun yang masuk; (3) hasil pembacaan difilter berdasarkan grant, sehingga hanya record yang grant-nya menunjuk siswa tersebut yang tampil. `LearningWorkspaceFlowTest.studentCannotReadAnotherStudentAndCannotWriteAnything()` mengujinya secara eksplisit. Ada satu pengecualian yang disengaja: **record lama yang tidak memiliki grant tidak muncul di halaman belajar sama sekali** — demi keamanan.
+
+**17. Bagaimana cara kerja kode undangan dan permintaan koneksi?**
+Pengajar menekan "Buat kode undangan". `ConnectionService` membuat 18 byte acak dari `SecureRandom`, memformatnya menjadi 36 karakter heksadesimal, lalu menyimpan **hash SHA-256**-nya — kode aslinya hanya ditampilkan sekali. Siswa memasukkan kode tersebut; service memverifikasi hash, masa berlaku 7 hari, dan status pengajar, lalu membuat permintaan berstatus `PENDING`. Pengajar menyetujui: relasi `ACTIVE` dibuat dan kode menjadi `USED`. Ada aturan menarik: **kode tidak hangus saat permintaan ditolak**, sehingga siswa bisa mengajukan ulang — ini diuji secara khusus.
+
+**18. Apa bedanya prototype dan aplikasi final?**
+Prototype sudah berfungsi penuh untuk alur inti (autentikasi, koneksi, enam modul belajar, laporan progres) dan datanya bertahan. Yang membedakan aplikasi final: backend SQL terpusat dengan kunci asing, peran administrator yang menyetujui pendaftaran pengajar, reset kata sandi dan pembatasan percobaan login, lampiran berkas, ekspor laporan, jadwal berulang, tema gelap, dan cakupan test yang lebih tinggi. Daftar lengkapnya ada di Bab 13 dan Bab 14.
+
+### 17.4 Seputar Status dan Rencana
+
+**19. Fitur apa yang sudah bisa didemonstrasikan?**
+Hampir semuanya: login dan registrasi, dashboard dengan angka dari data nyata, membuka isi materi lengkap, menambah tugas, menambah evaluasi, melihat laporan progres yang berubah otomatis, seluruh alur kode undangan → permintaan → persetujuan, menandai tugas selesai sebagai siswa, dan terbukti bahwa data bertahan setelah aplikasi ditutup. Alur yang paling aman didemonstrasikan adalah "pengajar menambah tugas → siswa menandai selesai → kartu progres berubah", karena hanya butuh dua akun dan langsung terlihat di layar.
+
+**20. Bagaimana Anda memastikan sebuah fitur benar-benar berfungsi, bukan sekadar ada tombolnya?**
+Dengan tiga cara. **Pertama**, membaca source code untuk menelusuri apakah ada service yang benar-benar dipanggil. **Kedua**, menulis pengujian otomatis: saat ini ada 67 test, termasuk `AuthScreenTest` yang benar-benar mencari tombol "Masuk" di pohon komponen Swing lalu menekan tombolnya dan memastikan sesi terbentuk — bukan sekadar memeriksa method ada. **Ketiga**, menjalankan aplikasinya sungguhan. Contoh: status "tampilan saja" sengaja tidak dipakai di dokumen ini. Kalau sebuah fitur tidak memiliki bukti, saya tulis "sebagian berfungsi" atau "direncanakan".
+
+**21. Apa rencana pengembangan setelah UTS?**
+Delapan tahap sudah diuraikan di Bab 13. Urutannya: stabilisasi dan perbaikan bug → melengkapi model dan CRUD → menyelesaikan modul jadwal, materi, tugas, dan evaluasi → melengkapi penyimpanan dan relasi data (termasuk backend SQL) → menyelesaikan autentikasi dan pembatasan akses → memperbaiki UI dan validasi → pengujian integrasi dan perbaikan bug → dokumentasi dan persiapan demonstrasi UAS. Setiap tahap punya kriteria selesai yang bisa diuji.
+
+**22. Apa target hasil akhir untuk UAS?**
+Aplikasi Java Swing yang dapat dijalankan, enam modul belajar yang terintegrasi penuh dengan CRUD, data yang tersimpan dengan benar dan bertahan, navigasi yang konsisten, pembatasan hak akses yang terbukti melalui pengujian, laporan progres yang dihitung dari data, cakupan test minimal 80%, dokumentasi yang akurat, dan demo yang dapat diulang. Fitur tambahan seperti lampiran berkas, ekspor PDF, jadwal berulang, dan tema gelap ada di daftar target pendukung.
+
+**23. Apa saja keterbatasan aplikasi saat ini?**
+Yang paling penting: (1) pendaftaran pengajar masih terbuka tanpa verifikasi administrator; (2) penyimpanan JSON tanpa transaksi lintas berkas dan tanpa enkripsi; (3) sesi hilang saat aplikasi ditutup; (4) belum ada pembatasan percobaan login; (5) hanya satu siswa aktif pada satu waktu di halaman belajar; (6) belum ada lampiran berkas maupun ekspor laporan; (7) belum ada pengukuran beban dengan data besar. Saya juga menemukan satu cacat nyata saat verifikasi — dekorasi latar gagal tergambar karena nilai fraksi pada `RadialGradientPaint` di luar rentang — yang sudah saya isolasi dan menyusun perbaikannya.
+
+**24. Apa hal yang paling membanggakan dari cara Anda bekerja?**
+Pemisahan tanggung jawab antar-lapisan. Setiap aturan hanya ada di satu tempat: validasi data di model, aturan akses di service, aturan penyimpanan di repository, dan presentasi di UI. Dampaknya terlihat langsung pada pengujian: seluruh logika bisnis dapat diuji tanpa membuka satu pun jendela, dan itu memungkinkan 67 test berjalan dalam waktu sekitar tiga menit.
+
+**25. Apa yang akan Anda perbaiki lebih dahulu bila diberi satu hari tambahan?**
+Dua hal. **Pertama**, menambahkan batas jumlah percobaan login, karena saat ini proteksi terhadap tebak kata sandi hanya bertumpu pada PBKDF2 yang membuat setiap percobaan lambat, dan itu bukan mekanisme pembatas yang sesungguhnya. **Kedua**, menulis pengujian tampilan yang benar-benar memanggil jalur lukis dekorasi (`Glass.paintCanvas()`), karena cacat dekorasi yang saya temukan pada Bab 11.4 lolos dari seluruh test yang ada dan baru terlihat ketika aplikasi dijalankan sungguhan.
+
+---
+<!--AKHIR-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

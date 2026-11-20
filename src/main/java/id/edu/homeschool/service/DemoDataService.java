@@ -1,7 +1,5 @@
 package id.edu.homeschool.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import id.edu.homeschool.model.AccountRole;
 import id.edu.homeschool.model.DemoMarkers;
 import id.edu.homeschool.model.Evaluation;
@@ -11,9 +9,6 @@ import id.edu.homeschool.model.LearningTask;
 import id.edu.homeschool.model.StudySession;
 import id.edu.homeschool.model.Subject;
 import id.edu.homeschool.repository.ApplicationRepositories;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -26,20 +21,17 @@ import java.util.Objects;
  *
  * <p>The seeder is deliberately conservative. It never overwrites an existing record: accounts
  * are matched by e-mail address, learning records are only created for a student that has no
- * learning data at all, and a marker file records what has already been seeded so the data is
+ * learning data at all, and SQLite marker tables record what has already been seeded so the data is
  * never created twice. Deleting the demo records keeps them deleted, and user data is never
  * touched.</p>
  *
- * <p>The marker file {@code demo-data.json} is the documented way to tell demo data apart from
- * user data: it lists the demo account ids and the demo record ids per resource type.</p>
+ * <p>The SQLite demo marker tables tell demo data apart from user data. The legacy
+ * {@code demo-data.json} file is only a migration source and is preserved for recovery.</p>
  */
 public final class DemoDataService {
 
     /** A demo account together with the password that can be used to sign in. */
     public record DemoAccount(String name, String email, String password, AccountRole role) { }
-
-    private static final ObjectMapper MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-    private static final String MARKER_FILE = "demo-data.json";
 
     private static final String TEACHER_PASSWORD = "DemoGuru2024!";
     private static final String STUDENT_PASSWORD = "DemoSiswa2024!";
@@ -59,7 +51,6 @@ public final class DemoDataService {
     private final AuthService auth;
     private final ConnectionService connections;
     private final LearningWorkspaceService learning;
-    private final Path markerFile;
     private DemoMarkers markers = new DemoMarkers();
 
     public DemoDataService(ApplicationRepositories repositories, AuthService auth, ConnectionService connections,
@@ -68,7 +59,6 @@ public final class DemoDataService {
         this.auth = Objects.requireNonNull(auth);
         this.connections = Objects.requireNonNull(connections);
         this.learning = Objects.requireNonNull(learning);
-        this.markerFile = repositories.getDataDirectory().resolve(MARKER_FILE);
         loadMarkers();
     }
 
@@ -740,19 +730,17 @@ public final class DemoDataService {
     /* ---------------- markers ---------------- */
 
     private void loadMarkers() {
-        if (!Files.exists(markerFile)) return;
         try {
-            markers = MAPPER.readValue(markerFile.toFile(), DemoMarkers.class);
-        } catch (IOException | RuntimeException exception) {
+            markers = repositories.demoMarkers().load();
+        } catch (RuntimeException exception) {
             markers = new DemoMarkers();
         }
     }
 
     private void saveMarkers() {
         try {
-            Files.createDirectories(markerFile.getParent());
-            MAPPER.writeValue(markerFile.toFile(), markers);
-        } catch (IOException exception) {
+            repositories.demoMarkers().save(markers);
+        } catch (RuntimeException exception) {
             System.err.println("Penanda data demo tidak dapat disimpan: " + exception.getMessage());
         }
     }

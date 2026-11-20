@@ -10,6 +10,7 @@ import id.edu.homeschool.service.SessionRegistry;
 import id.edu.homeschool.ui.MainFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.JOptionPane;
 
 /** Entry point of the Personal Homeschooling Learning System. */
 public final class Main {
@@ -20,7 +21,16 @@ public final class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             setSystemLookAndFeel();
-            ApplicationRepositories repositories = ApplicationRepositories.inDefaultLocation();
+            ApplicationRepositories repositories;
+            try {
+                repositories = ApplicationRepositories.inDefaultLocation();
+            } catch (RuntimeException exception) {
+                JOptionPane.showMessageDialog(null,
+                        "Aplikasi tidak dapat memulai penyimpanan SQLite. "
+                        + exception.getMessage() + "\nData JSON asli tidak dihapus.",
+                        "Gagal memulai aplikasi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             SessionRegistry sessions = new SessionRegistry(repositories.accounts());
             AuthService authentication = new AuthService(repositories.accounts(), sessions);
             ConnectionService connections = new ConnectionService(repositories.accounts(), repositories.invitations(),

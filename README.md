@@ -27,9 +27,12 @@ Aplikasi membuat data contoh pada pemakaian pertama sehingga tidak ada layar yan
 
 Pengajar Rani terhubung dengan Dimas, Nadia, dan Yusuf. Bagus terhubung dengan Aulia. Yusuf juga mengirim permintaan koneksi ke Siti dan Aulia mengirim permintaan ke Rani, sehingga halaman Permintaan siswa dan Undangan tidak kosong.
 
-### Cara membedakan data demo dari data pengguna
+### Cara membedakan Data demo dari data pengguna
 
-Berkas `demo-data.json` pada direktori data adalah penanda resmi. Isinya:
+Metadata penanda demo disimpan dalam tabel SQLite `demo_accounts`, `demo_resources`,
+`seeded_students`, dan `seeded_teachers`. Berkas lama `demo-data.json` digunakan
+sebagai sumber satu kali saat migrasi dan tetap dipertahankan sebagai recovery copy.
+Struktur lama yang sempat digunakan:
 
 - `accounts`: daftar id akun yang dibuat oleh seeding demo.
 - `resources`: daftar id record per jenis (`subject`, `material`, `task`, `session`, `evaluation`, `goal`) yang dibuat oleh seeding demo.
@@ -39,7 +42,7 @@ Antarmuka memakai penanda ini untuk menampilkan pill "Data demo" pada detail mat
 
 1. Akun demo hanya dibuat bila email tersebut belum terdaftar. Akun yang sudah ada tidak pernah diubah.
 2. Kurikulum demo hanya dibuat untuk siswa yang belum memiliki materi, tugas, jadwal, evaluasi, atau target. Data siswa yang sudah ada tidak pernah ditimpa.
-3. Penanda `demo-data.json` memastikan seeding tidak pernah dijalankan dua kali untuk siswa yang sama, sehingga data demo yang dihapus pengguna tidak muncul kembali.
+3. Penanda SQLite memastikan seeding tidak pernah dijalankan dua kali untuk siswa yang sama, sehingga data demo yang dihapus pengguna tidak muncul kembali.
 4. Data pengguna yang sudah ada sebelum aplikasi ini dijalankan tetap utuh dan dapat dibaca seperti semula.
 
 ## Isi data demo
@@ -95,7 +98,7 @@ Catatan implementasi: blur asli di balik jendela tidak dipakai karena Swing tida
 - JDK 21.
 - Maven 3.9+ untuk build dan menjalankan project.
 - NetBeans dengan dukungan project Maven.
-- Jackson Databind dan Java Time untuk JSON; JUnit 5 untuk test.
+- Jackson Databind dan Java Time untuk migrasi JSON; SQLite JDBC untuk persistence; JUnit 5 untuk test.
 
 Hash kata sandi menggunakan PBKDF2-HMAC-SHA256 dari JDK, 210.000 iterasi, salt acak 16 byte, dan hasil 256 bit. Password tidak punya getter atau field plaintext. Password input pada layar dibersihkan setelah submit. Kode undangan menggunakan `SecureRandom` dan hanya hash SHA-256 yang disimpan.
 
@@ -113,9 +116,23 @@ NetBeans menyediakan Maven bawaan sehingga **Tools > Options > Java > Maven** su
 
 Direktori default: `<user.home>/.homeschooling-learning-system/data/`.
 
-Data fitur lama tetap berada pada file masing-masing. Autentikasi menambahkan `accounts.json`, `teacher-invitations.json`, `teacher-connection-requests.json`, dan `teacher-student-connections.json`; workspace menambahkan `learning-access-grants.json`. Seeding demo menambahkan `demo-data.json` sebagai penanda. File lama seperti `students.json` tidak diimpor atau ditimpa otomatis, karena tidak memuat hash password dan identitas pemilik akun yang dapat diverifikasi. Record lama tanpa grant tidak muncul pada workspace akun baru, tetapi tetap terbaca sebagai arsip pada halaman Data pengajar dan Data siswa.
+Database utama adalah `homeschooling.db`. Schema dibuat otomatis oleh `DatabaseManager`,
+dan setiap repository model memakai prepared statement SQLite. Koneksi mengaktifkan
+foreign keys, `busy_timeout`, dan WAL mode.
 
-JSON disimpan lokal pada komputer yang menjalankan aplikasi. File JSON tidak dienkripsi, sesi hilang ketika aplikasi ditutup, dan tidak ada server, transaksi lintas-file, pembatasan percobaan login, atau kontrol akses filesystem yang dibuat oleh aplikasi ini. Karena itu prototipe ini tidak memberikan jaminan keamanan multi-pengguna setara layanan server. Batasi akses OS ke direktori data dan jangan gunakan untuk kredensial produksi.
+Saat database baru dibuat dan berkas JSON lama ditemukan, `JsonToSqliteMigrator`
+membuat backup `json-backup-<timestamp>/`, membaca JSON lama, memindahkan record
+beserta ID, status, timestamp, password hash, relasi, dan grant, lalu menandai
+migrasi sebagai selesai pada tabel `app_migrations`. Migrasi adalah idempotent dan
+berkas JSON asli tidak dihapus atau dimodifikasi.
+
+File legacy seperti `students.json` tetap dipertahankan sebagai sumber recovery dan
+arsip. Record lama tanpa learning access grant tetap tidak terlihat pada workspace
+akun baru. Hapus atau restore database hanya setelah membuat backup database dan backup JSON.
+
+SQLite dan JSON tidak dienkripsi, sesi hilang ketika aplikasi ditutup, dan tidak ada
+server atau kontrol akses filesystem tambahan. Karena itu prototipe ini tidak
+memberikan jaminan keamanan multi-pengguna setara layanan server.
 
 ## Struktur package
 
@@ -123,7 +140,7 @@ JSON disimpan lokal pada komputer yang menjalankan aplikasi. File JSON tidak die
 src/main/java/id/edu/homeschool/
   Main.java
   model/       Entitas dan status domain
-  repository/  Repository<T> dan implementasi JSON
+  repository/  Repository<T>, SQLite, migrasi JSON, dan database infrastructure
   service/     Autentikasi, sesi, koneksi, workspace, dan seeding demo
   ui/          Jendela, shell aplikasi, dan halaman
   ui/design/   Token desain dan komponen UI reusable

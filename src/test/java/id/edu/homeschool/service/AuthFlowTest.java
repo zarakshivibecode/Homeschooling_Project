@@ -38,7 +38,7 @@ class AuthFlowTest {
         TestEnvironment restarted = new TestEnvironment(temp);
         UserSession again = restarted.auth.login("siswa@uji.test", "SiswaPassword2040".toCharArray());
         assertEquals(registered.id(), again.accountId());
-        assertTrue(Files.readString(temp.resolve("accounts.json")).contains("siswa@uji.test"));
+        assertTrue(restarted.repositories.accounts().findById(registered.id()).isPresent());
     }
 
     @Test void duplicateEmailIsRejectedWithAReadableMessage() {
@@ -60,9 +60,9 @@ class AuthFlowTest {
 
     @Test void passwordIsStoredAsHashAndNeverInPlainText() throws Exception {
         environment.auth.registerTeacher("Pengajar", "guru@uji.test", "GuruPassword2040".toCharArray());
-        String stored = Files.readString(temp.resolve("accounts.json"));
+        String stored = environment.repositories.accounts().findAll().getFirst().getPasswordHash();
         assertFalse(stored.contains("GuruPassword2040"));
-        assertTrue(stored.contains("pbkdf2-sha256$"));
+        assertTrue(stored.startsWith("pbkdf2-sha256$"));
         assertNotEquals("GuruPassword2040", environment.repositories.accounts().findAll().getFirst().getPasswordHash());
     }
 

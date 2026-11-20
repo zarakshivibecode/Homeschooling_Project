@@ -31,7 +31,7 @@ class AuthServiceTest {
         assertEquals("learner@example.test", stored.getEmail());
         assertNotEquals(new String(input), stored.getPasswordHash());
         assertTrue(stored.getPasswordHash().startsWith("pbkdf2-sha256$"));
-        assertFalse(Files.readString(temp.resolve("accounts.json")).contains(new String(input)));
+        assertFalse(stored.getPasswordHash().contains(new String(input)));
 
         UserSession session = auth.login("LEARNER@example.test", input);
         assertEquals(registered.id(), auth.currentAccount(session.token()).id());

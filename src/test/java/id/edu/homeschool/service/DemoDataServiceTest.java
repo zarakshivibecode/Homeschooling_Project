@@ -2,6 +2,7 @@ package id.edu.homeschool.service;
 
 import id.edu.homeschool.model.AccountRole;
 import id.edu.homeschool.repository.ApplicationRepositories;
+import id.edu.homeschool.repository.DatabaseManager;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
@@ -132,7 +133,8 @@ class DemoDataServiceTest {
         assertTrue(demo.isDemoResource(LearningWorkspaceService.TYPE_MATERIAL, material.getId()),
                 "Materi demo harus ditandai pada berkas penanda.");
         assertTrue(demo.isDemoAccount(student.accountId()), "Akun demo harus ditandai.");
-        assertTrue(java.nio.file.Files.exists(temp.resolve("demo-data.json")));
+        assertTrue(demo.isDemoResource(LearningWorkspaceService.TYPE_MATERIAL, material.getId()));
+        assertTrue(java.nio.file.Files.exists(temp.resolve(DatabaseManager.DATABASE_FILE)));
     }
 
     @Test void aStudentCannotReachAnotherStudentThroughTheDemoCurriculum() {

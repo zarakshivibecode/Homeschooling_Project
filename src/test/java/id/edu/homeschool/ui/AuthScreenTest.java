@@ -33,7 +33,7 @@ class AuthScreenTest {
         AtomicReference<UserSession> captured = new AtomicReference<>();
         AuthScreen screen = new AuthScreen(environment.auth, captured::set);
 
-        JButton submit = findButton(screen, "Masuk");
+        JButton submit = findButton(screen, "Sign In");
         JTextField email = findField(submit, JTextField.class);
         JPasswordField password = findField(submit, JPasswordField.class);
         assertNotNull(submit);

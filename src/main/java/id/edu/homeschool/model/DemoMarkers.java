@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Index of the records that were created by the built-in demo seeder. The file is stored next to
- * the other JSON data so demo records can be told apart from records the user created.
+ * Index of the records that were created by the built-in demo seeder. The index is stored in
+ * SQLite marker tables; legacy demo-data.json remains an optional migration source.
  */
 public final class DemoMarkers {
 

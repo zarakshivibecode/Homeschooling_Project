@@ -43,9 +43,9 @@ class ConnectionServiceTest {
 
     @Test void codeIsStoredAsHashStudentRequestsAndTeacherApprovalCreatesActiveRelation() throws Exception {
         CreatedInvitation issued = connections.createInvitation(teacher.token());
-        String storedJson = Files.readString(temp.resolve("teacher-invitations.json"));
-        assertFalse(storedJson.contains(issued.code()));
-        assertTrue(storedJson.contains("codeHash"));
+        var stored = repositories.invitations().findAll().getFirst();
+        assertFalse(stored.getCodeHash().equals(issued.code()));
+        assertTrue(stored.getCodeHash().matches("[a-f0-9]{64}"));
 
         var request = connections.requestConnection(student.token(), issued.code());
         assertEquals("Student One", connections.pendingForTeacher(teacher.token()).getFirst().studentName());

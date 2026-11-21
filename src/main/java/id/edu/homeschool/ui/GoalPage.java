@@ -5,6 +5,7 @@ import id.edu.homeschool.service.LearningWorkspaceService;
 import id.edu.homeschool.ui.design.DataTable;
 import id.edu.homeschool.ui.design.Dialogs;
 import id.edu.homeschool.ui.design.FormDialog;
+import id.edu.homeschool.ui.design.Theme;
 import id.edu.homeschool.ui.design.Ui;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +14,8 @@ import javax.swing.JButton;
 
 /** Target page: learning goals with a target date. */
 public final class GoalPage extends LearningTablePage<LearningGoal> {
+
+    final GoalProgressSummary progressSummary;
 
     public GoalPage(Workspace workspace) {
         super(workspace, "Target belajar",
@@ -32,6 +35,19 @@ public final class GoalPage extends LearningTablePage<LearningGoal> {
             toggle.addActionListener(event -> toggleAchievement());
             addToolbarAction(toggle);
         }
+
+        progressSummary = new GoalProgressSummary(workspace);
+        remove(header);
+        javax.swing.JPanel top = Ui.transparent(new java.awt.BorderLayout(0, Theme.SPACE_3));
+        top.add(header, java.awt.BorderLayout.NORTH);
+        top.add(progressSummary, java.awt.BorderLayout.CENTER);
+        add(top, java.awt.BorderLayout.NORTH);
+        refresh();
+    }
+
+    @Override public void refresh() {
+        super.refresh();
+        if (progressSummary != null) progressSummary.refresh();
     }
 
     private void toggleAchievement() {

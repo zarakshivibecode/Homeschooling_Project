@@ -19,6 +19,8 @@ import javax.swing.JComponent;
 /** Tugas page: assignments with a due date, the target student and the full instructions. */
 public final class TaskPage extends LearningTablePage<LearningTask> {
 
+    final TaskStatusSummary statusSummary;
+
     public TaskPage(Workspace workspace) {
         super(workspace, "Tugas",
                 "Tugas yang perlu diselesaikan beserta tenggat, target siswa, dan status pengerjaannya.",
@@ -32,6 +34,19 @@ public final class TaskPage extends LearningTablePage<LearningTask> {
         table.setColumnRenderer(4, DataTable.statusRenderer());
         table.addFilter("Mata pelajaran", () -> Lookups.subjectNames(workspace),
                 task -> Lookups.subjectName(workspace, task.getSubjectId()));
+
+        statusSummary = new TaskStatusSummary(workspace);
+        remove(header);
+        javax.swing.JPanel top = Ui.transparent(new java.awt.BorderLayout(0, Theme.SPACE_3));
+        top.add(header, java.awt.BorderLayout.NORTH);
+        top.add(statusSummary, java.awt.BorderLayout.CENTER);
+        add(top, java.awt.BorderLayout.NORTH);
+        refresh();
+    }
+
+    @Override public void refresh() {
+        super.refresh();
+        if (statusSummary != null) statusSummary.refresh();
     }
 
     @Override protected void contributeActions(DataTable<LearningTask> table) {

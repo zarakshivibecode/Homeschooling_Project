@@ -1,6 +1,7 @@
 package id.edu.homeschool.ui.design;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -22,7 +23,7 @@ public class StatusBadge extends JComponent {
     public StatusBadge(String text, Theme.StatusStyle style) {
         this.text = text == null ? "" : text;
         this.style = style == null ? Theme.neutral() : style;
-        setFont(Theme.FONT_11);
+        setFont(Theme.FONT_11_BOLD);
         setOpaque(false);
         setPreferredSize(measure());
     }
@@ -45,6 +46,11 @@ public class StatusBadge extends JComponent {
     }
 
     public String text() { return text; }
+
+    @Override public void setFont(Font font) {
+        super.setFont(font);
+        if (text != null && font != null) setPreferredSize(measure());
+    }
 
     private Dimension measure() {
         FontMetrics metrics = getFontMetrics(getFont());
@@ -81,7 +87,7 @@ public class StatusBadge extends JComponent {
             left += Theme.SPACE_3 + 1;
         }
 
-        g.setFont(Theme.FONT_11_BOLD);
+        g.setFont(getFont());
         g.setColor(style.foreground());
         FontMetrics metrics = g.getFontMetrics();
         int textY = (height + metrics.getAscent() - metrics.getDescent()) / 2;

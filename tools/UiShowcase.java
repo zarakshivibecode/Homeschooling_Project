@@ -247,6 +247,8 @@ public final class UiShowcase {
         capture(frame, "04-pengajar-materi");
         shell.showPage("tasks");
         capture(frame, "05-pengajar-tugas");
+        shell.showPage("goals");
+        capture(frame, "05b-pengajar-target-belajar");
         shell.showPage("schedule");
         capture(frame, "06-pengajar-jadwal");
         shell.showPage("evaluations");

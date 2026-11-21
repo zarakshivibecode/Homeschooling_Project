@@ -14,6 +14,8 @@ import java.util.Map;
 /** Jadwal page: scheduled study sessions for the selected student. */
 public final class SchedulePage extends LearningTablePage<StudySession> {
 
+    final StudySessionDurationChart durationChart;
+
     public SchedulePage(Workspace workspace) {
         super(workspace, "Jadwal belajar",
                 "Sesi belajar yang telah dijadwalkan beserta tanggal, waktu, dan durasinya.",
@@ -26,6 +28,20 @@ public final class SchedulePage extends LearningTablePage<StudySession> {
                 "Tambahkan sesi belajar pertama agar agenda belajar siswa terlihat jelas.");
         table.addFilter("Mata pelajaran", () -> Lookups.subjectNames(workspace),
                 session -> Lookups.subjectName(workspace, session.getSubjectId()));
+
+        durationChart = new StudySessionDurationChart(workspace);
+        remove(header);
+        javax.swing.JPanel top = id.edu.homeschool.ui.design.Ui.transparent(
+                new java.awt.BorderLayout(0, id.edu.homeschool.ui.design.Theme.SPACE_3));
+        top.add(header, java.awt.BorderLayout.NORTH);
+        top.add(durationChart, java.awt.BorderLayout.CENTER);
+        add(top, java.awt.BorderLayout.NORTH);
+        refresh();
+    }
+
+    @Override public void refresh() {
+        super.refresh();
+        if (durationChart != null) durationChart.refresh();
     }
 
     /** The Indonesian name of the weekday, for example "Rabu". */

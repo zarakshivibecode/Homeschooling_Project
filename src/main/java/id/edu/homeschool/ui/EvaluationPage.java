@@ -9,6 +9,7 @@ import id.edu.homeschool.ui.design.Dialogs;
 import id.edu.homeschool.ui.design.FormDialog;
 import id.edu.homeschool.ui.design.Theme;
 import id.edu.homeschool.ui.design.Ui;
+import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ import javax.swing.JComponent;
 
 /** Evaluasi page: scores recorded by the teacher for the selected student. */
 public final class EvaluationPage extends LearningTablePage<Evaluation> {
+
+    final EvaluationTrendChart trendChart;
 
     public EvaluationPage(Workspace workspace) {
         super(workspace, "Evaluasi",
@@ -32,6 +35,19 @@ public final class EvaluationPage extends LearningTablePage<Evaluation> {
                 "Catat nilai pertama agar laporan progres siswa dapat dihitung.");
         table.addFilter("Mata pelajaran", () -> Lookups.subjectNames(workspace),
                 evaluation -> Lookups.subjectName(workspace, evaluation.getSubjectId()));
+
+        trendChart = new EvaluationTrendChart(workspace);
+        remove(header);
+        javax.swing.JPanel top = Ui.transparent(new BorderLayout(0, Theme.SPACE_3));
+        top.add(header, BorderLayout.NORTH);
+        top.add(trendChart, BorderLayout.CENTER);
+        add(top, BorderLayout.NORTH);
+        refresh();
+    }
+
+    @Override public void refresh() {
+        super.refresh();
+        if (trendChart != null) trendChart.refresh();
     }
 
     @Override protected void contributeActions(DataTable<Evaluation> table) {
